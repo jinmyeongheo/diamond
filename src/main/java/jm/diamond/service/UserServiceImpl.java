@@ -13,12 +13,15 @@ public class UserServiceImpl implements UserService {
    private final UserRepository userRepository;
 
    @Override
-   public void doWork() {
+   public User doWork() {
       List<User> users = userRepository.findByUserName("허진명");
       System.out.println("user = " + users.get(0).getUserName());
+
 
       Optional<User> byId = userRepository.findById(1494l);
       String userName = byId.get().getUserName();
       System.out.println(userName);
+
+      return users.get(0);
    }
 }
