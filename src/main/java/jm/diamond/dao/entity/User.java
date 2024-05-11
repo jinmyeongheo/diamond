@@ -23,5 +23,7 @@ public class User {
    /** 사용자명 */
    private String userName;
 
+   private String pw;
+
 
 }
