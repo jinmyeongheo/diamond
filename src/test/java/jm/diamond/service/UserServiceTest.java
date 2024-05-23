@@ -29,10 +29,10 @@ class UserServiceTest {
    @Test
    void doWork() {
       List<User> users = new ArrayList<>();
-      users.add(new User(111l,"jinmyeong.heo@seeroo.co.kr","허진명"));
+      users.add(new User(111l,"jinmyeong.heo@seeroo.co.kr","허진명", "1234"));
 
       when(userRepository.findByUserName("허진명")).thenReturn(users);
-      when(userRepository.findById(1494l)).thenReturn(Optional.of(new User(123l,"1@1.com","하이")));
+      when(userRepository.findById(1494l)).thenReturn(Optional.of(new User(123l,"1@1.com","하이", "1234")));
       User result = userService.doWork();
 
       Assertions.assertEquals(users.get(0), result);

@@ -7,7 +7,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,26 +14,28 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class CustomAuthenticationProvider implements AuthenticationProvider {
 
-    private final CustomUserDetailService customUserDetailService;
-    @Override
-    public Authentication authenticate(Authentication authentication)
-        throws AuthenticationException {
+   // https://assu10.github.io/dev/2023/12/16/springsecurity-filter/
+   private final CustomUserDetailService customUserDetailService;
 
-        UserDetails userDetails = customUserDetailService.loadUserByUsername(
-            authentication.getName());
+   @Override
+   public Authentication authenticate(Authentication authentication)
+       throws AuthenticationException {
 
-        String reqPassword = authentication.getCredentials().toString();
+      UserDetails userDetails = customUserDetailService.loadUserByUsername(
+          authentication.getName());
 
-        // 패스워드 검증로직 추가
+      String reqPassword = authentication.getCredentials().toString();
 
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-            userDetails, userDetails.getPassword(), userDetails.getAuthorities());
+      // 패스워드 검증로직 추가
 
-        return usernamePasswordAuthenticationToken;
-    }
+      UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+          userDetails, userDetails.getPassword(), userDetails.getAuthorities());
 
-    @Override
-    public boolean supports(Class<?> aClass) {
-        return false;
-    }
+      return usernamePasswordAuthenticationToken;
+   }
+
+   @Override
+   public boolean supports(Class<?> aClass) {
+      return false;
+   }
 }

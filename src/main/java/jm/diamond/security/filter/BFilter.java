@@ -1,4 +1,4 @@
-package jm.diamond.filter;
+package jm.diamond.security.filter;
 
 import java.io.IOException;
 import javax.servlet.Filter;
