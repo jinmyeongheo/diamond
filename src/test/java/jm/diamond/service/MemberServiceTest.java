@@ -1,6 +1,5 @@
 package jm.diamond.service;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -13,26 +12,25 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class UserServiceTest {
+class MemberServiceTest {
    @Mock
    private UserRepository userRepository;
 
    @InjectMocks
-   private UserServiceImpl userService;
+   private MemberServiceImpl userService;
 
 
 
    @Test
    void doWork() {
       List<User> users = new ArrayList<>();
-      users.add(new User(111l,"jinmyeong.heo@seeroo.co.kr","허진명"));
+      users.add(new User(111l,"jinmyeong.heo@seeroo.co.kr","허진명", "1234"));
 
-      when(userRepository.findByUserName("허진명")).thenReturn(users);
-      when(userRepository.findById(1494l)).thenReturn(Optional.of(new User(123l,"1@1.com","하이")));
+      when(userRepository.findByName("허진명")).thenReturn(users);
+      when(userRepository.findById(1494l)).thenReturn(Optional.of(new User(123l,"1@1.com","하이","1234")));
       User result = userService.doWork();
 
       Assertions.assertEquals(users.get(0), result);

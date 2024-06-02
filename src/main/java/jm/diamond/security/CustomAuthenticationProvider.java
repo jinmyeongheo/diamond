@@ -10,31 +10,31 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
-@Component
 @RequiredArgsConstructor
 @Slf4j
-public class CustomAuthenticationProvider implements AuthenticationProvider {
+public class CustomAuthenticationProvider{
 
+//     implements AuthenticationProvider
     private final CustomUserDetailService customUserDetailService;
-    @Override
-    public Authentication authenticate(Authentication authentication)
-        throws AuthenticationException {
-
-        UserDetails userDetails = customUserDetailService.loadUserByUsername(
-            authentication.getName());
-
-        String reqPassword = authentication.getCredentials().toString();
-
-        // 패스워드 검증로직 추가
-
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-            userDetails, userDetails.getPassword(), userDetails.getAuthorities());
-
-        return usernamePasswordAuthenticationToken;
-    }
-
-    @Override
-    public boolean supports(Class<?> aClass) {
-        return false;
-    }
+//    @Override
+//    public Authentication authenticate(Authentication authentication)
+//        throws AuthenticationException {
+//
+//        UserDetails userDetails = customUserDetailService.loadUserByUsername(
+//            authentication.getName());
+//
+//        String reqPassword = authentication.getCredentials().toString();
+//
+//        // 패스워드 검증로직 추가
+//
+//        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+//            userDetails, userDetails.getPassword(), userDetails.getAuthorities());
+//
+//        return usernamePasswordAuthenticationToken;
+//    }
+//
+//    @Override
+//    public boolean supports(Class<?> aClass) {
+//        return false;
+//    }
 }

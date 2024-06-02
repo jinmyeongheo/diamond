@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Component;
 public class CustomUserDetailService implements UserDetailsService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -24,7 +27,7 @@ public class CustomUserDetailService implements UserDetailsService {
             UserDto userDto = new UserDtoBuilder()
                 .seq(user1.getSeq())
                 .loginId(user1.getEmail())
-                .password(user1.getPw())
+                .password(passwordEncoder.encode(user1.getPw()))
                 .role("admin")
                 .build();
             return userDto;

@@ -18,5 +18,6 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
         HttpServletResponse httpServletResponse, AuthenticationException e)
         throws IOException, ServletException {
         log.info("실패 핸들러 작동!!!");
+        httpServletResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
     }
 }
