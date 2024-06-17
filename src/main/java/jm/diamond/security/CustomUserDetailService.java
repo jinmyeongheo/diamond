@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 public class CustomUserDetailService implements UserDetailsService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -27,7 +26,7 @@ public class CustomUserDetailService implements UserDetailsService {
             UserDto userDto = new UserDtoBuilder()
                 .seq(user1.getSeq())
                 .loginId(user1.getEmail())
-                .password(passwordEncoder.encode(user1.getPw()))
+                .password(user1.getPw())
                 .role("admin")
                 .build();
             return userDto;

@@ -1,22 +1,27 @@
 package jm.diamond.config;
 
 import jm.diamond.security.CustomAuthenticationFailureHandler;
+import jm.diamond.security.CustomAuthenticationProvider;
 import jm.diamond.security.CustomAuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-@EnableWebSecurity
+@EnableWebSecurity(debug = true)  // request가 올 떄마다 어떤 filter를 사용하고 있는지 출력을 해준다.
 @RequiredArgsConstructor
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
     private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
-    @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder() {
-        return new BCryptPasswordEncoder();
+    private final CustomAuthenticationProvider customAuthenticationProvider;
+
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.authenticationProvider(customAuthenticationProvider);
     }
 
     @Override
@@ -27,6 +32,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //            .authorizeRequests()
 //            .anyRequest().permitAll()
 //        ;
+
+
         http.authorizeRequests()
             .antMatchers("/login.html").permitAll()
             .antMatchers("/signup.html").permitAll()
