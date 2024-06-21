@@ -35,8 +35,10 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
       long startTime = System.currentTimeMillis();
 
       // todo : ReadableRequestBodyWrapper와 ContentCachingResponseWrapper를 사용하는 케이스가 있음.
-      ContentCachingRequestWrapper contentCachingRequestWrapper = new ContentCachingRequestWrapper(httpServletRequest);
-      ContentCachingResponseWrapper contentCachingResponseWrapper = new ContentCachingResponseWrapper(httpServletResponse);
+      ContentCachingRequestWrapper contentCachingRequestWrapper = new ContentCachingRequestWrapper(
+          httpServletRequest);
+      ContentCachingResponseWrapper contentCachingResponseWrapper = new ContentCachingResponseWrapper(
+          httpServletResponse);
 
 
       HttpLogMessage httpLogMessage = HttpLogMessage.builder()
@@ -44,6 +46,7 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
           .httpMethod(HttpMethod.valueOf(httpServletRequest.getMethod()))
           .build();
 
+      // todo : mdc 적용
       log.info("req print : {}", httpLogMessage);
 
       filterChain.doFilter(contentCachingRequestWrapper, contentCachingResponseWrapper);
