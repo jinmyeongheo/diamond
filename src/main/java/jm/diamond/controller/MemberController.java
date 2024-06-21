@@ -1,6 +1,7 @@
 package jm.diamond.controller;
 
 import jm.diamond.dao.entity.User;
+import jm.diamond.rest_controller.ApiResponse;
 import jm.diamond.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;

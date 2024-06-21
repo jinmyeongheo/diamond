@@ -11,7 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-@EnableWebSecurity(debug = true)  // request가 올 떄마다 어떤 filter를 사용하고 있는지 출력을 해준다.
+//@EnableWebSecurity(debug = true)  // request가 올 떄마다 어떤 filter를 사용하고 있는지 출력을 해준다.
 @RequiredArgsConstructor
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
@@ -35,16 +35,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
         http.authorizeRequests()
-            .antMatchers("/login.html").permitAll()
-            .antMatchers("/signup.html").permitAll()
-            .antMatchers("/index.html").permitAll()
-            .antMatchers("/api/**").permitAll()
-            .antMatchers("/lib/**").permitAll()
-            .anyRequest().authenticated()
+//            .antMatchers("/login.html").permitAll()
+//            .antMatchers("/signup.html").permitAll()
+//            .antMatchers("/index.html").permitAll()
+//            .antMatchers("/api/**").permitAll()
+//            .antMatchers("/lib/**").permitAll()
+//            .anyRequest().authenticated()
+            .anyRequest().permitAll()
             .and().csrf().disable()
             .cors().disable()
             .httpBasic().disable()
         ;
+
         http.formLogin()
             .loginPage("/login.html")
             .loginProcessingUrl("/api/form/login")

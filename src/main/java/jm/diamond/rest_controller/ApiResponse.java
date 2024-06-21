@@ -1,5 +1,6 @@
-package jm.diamond.controller;
+package jm.diamond.rest_controller;
 
+import jm.diamond.controller.CommonResult;
 import lombok.Getter;
 
 @Getter
