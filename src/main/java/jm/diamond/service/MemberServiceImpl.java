@@ -7,6 +7,7 @@ import jm.diamond.dao.entity.User;
 import jm.diamond.dao.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Service;
 public class MemberServiceImpl implements MemberService {
 
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public User doWork() {
@@ -31,7 +32,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional
     public void registerMember(User user) {
-        user.encryptPassword(bCryptPasswordEncoder.encode(user.getPw()));
+        user.encryptPassword(passwordEncoder.encode(user.getPw()));
         userRepository.save(user);
     }
 }
