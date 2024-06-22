@@ -31,42 +31,47 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest httpServletRequest,
         HttpServletResponse httpServletResponse, FilterChain filterChain)
         throws ServletException, IOException {
-        long startTime = System.currentTimeMillis();
 
-        // todo : ReadableRequestBodyWrapper와 ContentCachingResponseWrapper를 사용하는 케이스가 있음.
-        ContentCachingRequestWrapper contentCachingRequestWrapper = new ContentCachingRequestWrapper(
-            httpServletRequest);
-        ContentCachingResponseWrapper contentCachingResponseWrapper = new ContentCachingResponseWrapper(
-            httpServletResponse);
+        try{
 
-        HttpLogMessage httpLogMessage = HttpLogMessage.builder()
-            .clientIp(httpServletRequest.getRequestURI())
-            .httpMethod(HttpMethod.valueOf(httpServletRequest.getMethod()))
-            .build();
-        /**
-         * todo : proxy_set_header 를 사용해서 nginx에서 들어온 요청에 대한 id를 톰켓에 넘겨주는 것도 방법
-         (HttpServletRequest)servletRequest).getHeader("X-RequestID");
-         출처: https://mangkyu.tistory.com/266 [MangKyu's Diary:티스토리]
-         */
-        // mdc 적용, thread local에 접근해서 req id 공유가능.
-        UUID uuid = UUID.randomUUID();
-        MDC.put("request_id", uuid.toString());
-        log.info("req print : {}", httpLogMessage);
+            long startTime = System.currentTimeMillis();
 
-        filterChain.doFilter(contentCachingRequestWrapper, contentCachingResponseWrapper);
+            // todo : ReadableRequestBodyWrapper와 ContentCachingResponseWrapper를 사용하는 케이스가 있음.
+            ContentCachingRequestWrapper contentCachingRequestWrapper = new ContentCachingRequestWrapper(
+                httpServletRequest);
+            ContentCachingResponseWrapper contentCachingResponseWrapper = new ContentCachingResponseWrapper(
+                httpServletResponse);
 
-        long endTime = System.currentTimeMillis();
-        HttpLogMessage httpLogMessage2 = HttpLogMessage.builder()
-            .clientIp(httpServletRequest.getRequestURI())
-            .httpMethod(HttpMethod.valueOf(httpServletRequest.getMethod()))
-            .elapsedTime((endTime - startTime) / 1000.0)
-            .build();
+            HttpLogMessage httpLogMessage = HttpLogMessage.builder()
+                .clientIp(httpServletRequest.getRequestURI())
+                .httpMethod(HttpMethod.valueOf(httpServletRequest.getMethod()))
+                .build();
+            /**
+             * todo : proxy_set_header 를 사용해서 nginx에서 들어온 요청에 대한 id를 톰켓에 넘겨주는 것도 방법
+             (HttpServletRequest)servletRequest).getHeader("X-RequestID");
+             출처: https://mangkyu.tistory.com/266 [MangKyu's Diary:티스토리]
+             */
+            // mdc 적용, thread local에 접근해서 req id 공유가능.
+            UUID uuid = UUID.randomUUID();
+            MDC.put("request_id", uuid.toString());
+            log.info("req print : {}", httpLogMessage);
 
-        log.info("res print : {}", httpLogMessage2);
+            filterChain.doFilter(contentCachingRequestWrapper, contentCachingResponseWrapper);
 
-        // todo : why copyBodyToResponse
-        contentCachingResponseWrapper.copyBodyToResponse();
-        // thread local 초기화.
-        MDC.clear();
+            long endTime = System.currentTimeMillis();
+            HttpLogMessage httpLogMessage2 = HttpLogMessage.builder()
+                .clientIp(httpServletRequest.getRequestURI())
+                .httpMethod(HttpMethod.valueOf(httpServletRequest.getMethod()))
+                .elapsedTime((endTime - startTime) / 1000.0)
+                .build();
+
+            log.info("res print : {}", httpLogMessage2);
+
+            // todo : why copyBodyToResponse
+            contentCachingResponseWrapper.copyBodyToResponse();
+        }finally {
+            // thread local의 request id 초기화
+            MDC.remove("request_id");
+        }
     }
 }
