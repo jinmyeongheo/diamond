@@ -1,12 +1,14 @@
 package jm.diamond.filter;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.MDC;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -34,18 +36,33 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
 
         try{
 
-            long startTime = System.currentTimeMillis();
-
-            // todo : ReadableRequestBodyWrapper와 ContentCachingResponseWrapper를 사용하는 케이스가 있음.
+            /** request body는  inputStream은 1회성
+             * 스프링이 제공하는 HttpServletRequestWrapper 구현체 ContentCachingRequestWrapper로
+             * 캐싱해서 사용한다.*/
             ContentCachingRequestWrapper contentCachingRequestWrapper = new ContentCachingRequestWrapper(
                 httpServletRequest);
+
             ContentCachingResponseWrapper contentCachingResponseWrapper = new ContentCachingResponseWrapper(
                 httpServletResponse);
 
+            CustomHttpServletRequestWrapper customReq = new CustomHttpServletRequestWrapper(
+                httpServletRequest);
+
+            String s = IOUtils.toString(customReq.getInputStream(),
+                StandardCharsets.UTF_8);
+
+            log.info("body!! :::: {}", s);
+
+            String s2 = IOUtils.toString(customReq.getInputStream(),
+                StandardCharsets.UTF_8);
+            log.info("body!! :::: {}", s2);
+
+            long startTime = System.currentTimeMillis();
             HttpLogMessage httpLogMessage = HttpLogMessage.builder()
                 .clientIp(httpServletRequest.getRequestURI())
                 .httpMethod(HttpMethod.valueOf(httpServletRequest.getMethod()))
                 .build();
+
             /**
              * todo : proxy_set_header 를 사용해서 nginx에서 들어온 요청에 대한 id를 톰켓에 넘겨주는 것도 방법
              (HttpServletRequest)servletRequest).getHeader("X-RequestID");
@@ -56,7 +73,7 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
             MDC.put("request_id", uuid.toString());
             log.info("req print : {}", httpLogMessage);
 
-            filterChain.doFilter(contentCachingRequestWrapper, contentCachingResponseWrapper);
+            filterChain.doFilter(customReq, contentCachingResponseWrapper);
 
             long endTime = System.currentTimeMillis();
             HttpLogMessage httpLogMessage2 = HttpLogMessage.builder()
@@ -66,6 +83,9 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
                 .build();
 
             log.info("res print : {}", httpLogMessage2);
+
+
+            byte[] contentAsByteArray = contentCachingRequestWrapper.getContentAsByteArray();
 
             // todo : why copyBodyToResponse
             contentCachingResponseWrapper.copyBodyToResponse();

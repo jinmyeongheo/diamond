@@ -1,7 +1,9 @@
 package jm.diamond.rest_controller;
 
+import jm.diamond.controller.OrderReq;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -9,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrderController {
 
    @PostMapping("/count/order")
-   public ApiResponse countOrder(){
+   public ApiResponse countOrder(@RequestBody OrderReq orderReq){
       return ApiResponse.OK;
    }
 
