@@ -9,9 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import org.apache.commons.io.IOUtils;
 
-// todo : inputStream, byte[], apache Common IO, servletInputStream, byteArrayInputStream, httpMessageConverter
-// todo :  HttpServletRequestWrapper를 커스텀한 이유
-//  ServletInputStream은 단방향 스트림으로 설계되었있기 때문에 캐싱해서 여러번 사용가능 하도록 만든다.
 public class CustomHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
    private final byte[] cachedBytes;
