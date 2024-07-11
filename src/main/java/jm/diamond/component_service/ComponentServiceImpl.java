@@ -5,7 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 /**
- * Component Service
+ * Component Service or 퍼사드 패턴
  *
  * DAO를 의존해서는 안 된다.
  * 하나의 작업은 Transaction을 지켜야 한다.
@@ -22,5 +22,5 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class ComponentServiceImpl implements ComponentService {
-
+// todo 여러서비스를 하나로?
 }

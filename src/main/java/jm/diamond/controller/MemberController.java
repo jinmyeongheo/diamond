@@ -3,7 +3,11 @@ package jm.diamond.controller;
 import jm.diamond.dao.entity.User;
 import jm.diamond.rest_controller.ApiResponse;
 import jm.diamond.service.MemberService;
+import jm.diamond.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,6 +32,11 @@ public class MemberController {
             .build();
         memberService.registerMember(user);
 
+        return ApiResponse.OK;
+    }
+
+    @GetMapping("/search")
+    public ApiResponse searchMyNameOnGoogle(Pageable pageable){
         return ApiResponse.OK;
     }
 }

@@ -1,30 +1,26 @@
 package jm.diamond.dao.entity;
 
-import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity(name = "pos_info")
-@Getter
+@Entity(name = "affiliate")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Builder
 @AllArgsConstructor
-public class PosInfo {
+@Builder
+public class Store {
 
    @Id
-   @Column(name = "posSeq")
+   @Column(name = "affSeq")
    private Long seq;
 
-//   @OneToMany(mappedBy = "posInfo")
-//   private List<Order> order;
+   private String affName;
 
-   private String posName;
+   private String affNo;
 
 }
