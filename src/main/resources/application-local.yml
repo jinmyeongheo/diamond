@@ -1,4 +1,5 @@
 # 로컬 개발환경 설정
+# 1. 인메모리 db 빌드, 2. table create ,3. 테스트 데이터 insert, 4. 필요에 따라 flush, clear 실행.
 server:
   port: 8888
 
