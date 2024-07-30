@@ -1,25 +1,26 @@
+# 로컬 개발환경 설정
+server:
+  port: 8888
+
 spring:
   datasource:
-    hikari:
-      max-lifetime: 58000 #DB wait_timeout=60
-      idle-timeout: 58000
-      connection-test-query: SELECT 1
+    url: jdbc:h2:mem:local;MODE=MySQL;DATABASE_TO_LOWER=TRUE # in-memory, mysql
+    username: sa # 기본계정은 비밀번호 없음.
+    password:
+    driver-class-name: org.h2.Driver
+  h2:
+    console:
+      enabled: true
   jpa:
     open-in-view: true
-    database-platform: org.hibernate.dialect.MariaDB103Dialect
+    database-platform: org.hibernate.dialect.MySQL5Dialect
     hibernate:
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
         implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
     properties: # Difference between spring.jpa.properties.hibernate and spring.jpa.hibernate
       hibernate:
-        ddl-auto: none
+        ddl-auto: create
         show-sql: true
         format_sql: true
         use_sql_comments: true
-logging:
-  level:
-    org:
-      hibernate:
-        sql : debug
-        type : trace

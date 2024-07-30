@@ -18,6 +18,7 @@
     <java.version>8</java.version>
   </properties>
   <dependencies>
+    <!--https://docs.spring.io/spring-boot/docs/2.2.6.RELEASE/reference/html/appendix-dependency-versions.html#appendix-dependency-versions-->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -62,6 +63,13 @@
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
       <version>2.11.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>2.1.214</version>
+      <scope>test</scope>
     </dependency>
 
   </dependencies>
