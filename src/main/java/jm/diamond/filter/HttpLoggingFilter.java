@@ -24,9 +24,13 @@ import org.springframework.web.util.ContentCachingResponseWrapper;
 
 
 /**
- * https://beaniejoy.tistory.com/97 https://beaniejoy.tistory.com/96 why oncePerRequestFilter 1.
- * forward 처리 2. mvc 에러페이지 처리 중복 호출되는것을 막기 위해서. why filter 1. 가장먼저 request를 받고 가장마지막에 response를 처리할
- * 수 있어서. 2. 요청과 응답의 header 조작이 가능
+ * https://beaniejoy.tistory.com/97 https://beaniejoy.tistory.com/96
+ * why oncePerRequestFilter
+ * 1. forward 처리
+ * 2. mvc 에러페이지 처리 중복 호출되는것을 막기 위해서.
+ * why filter
+ * 1. 가장먼저 request를 받고 가장마지막에 response를 처리할 수 있어서.
+ * 2. 요청과 응답의 header 조작이 가능
  */
 @Slf4j
 @Component
@@ -40,6 +44,9 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
 
       try {
 
+         ContentCachingResponseWrapper contentCachingResponseWrapper = new ContentCachingResponseWrapper(
+             httpServletResponse);
+
          /** request body는  inputStream은 1회성
           * ContentCachingRequestWrapper를 사용하지않은 이유
           * 캐싱될려면 한번은 읽혀야하는데(getIputStream)
@@ -47,9 +54,6 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
           * controller에서 getContentAsByteArray()를 사용하게 할수 있나?
           * 그래서 HttpServletRequestWrapper를 상속한 클래스를 만들어서 getInputStream()호출 시 캐시된
           * 데이터를 리턴하도록 만든다.*/
-         ContentCachingResponseWrapper contentCachingResponseWrapper = new ContentCachingResponseWrapper(
-             httpServletResponse);
-
          CustomHttpServletRequestWrapper customReq = new CustomHttpServletRequestWrapper(
              httpServletRequest);
 
