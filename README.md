@@ -2,7 +2,7 @@
 # java 1.8
 # security 5.2.2
 
-- ttps://blog.gangnamunni.com/post/isolate-transaction-from-domain-model/?utm_source=oneoneone
+- https://blog.gangnamunni.com/post/isolate-transaction-from-domain-model/?utm_source=oneoneone
 - https://oneoneone.kr/content/fa9dff53
 - https://sup2is.github.io/2020/01/29/java-immutable-object-with-string.html
 - https://vladmihalcea.com/spring-transactional-annotation/
