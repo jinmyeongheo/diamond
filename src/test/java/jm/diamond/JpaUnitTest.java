@@ -21,7 +21,7 @@ import org.springframework.test.context.TestPropertySource;
 @OverrideAutoConfiguration(enabled = true)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ComponentScan(basePackages={"jm.diamond.dao"})
-@TestPropertySource(locations = "classpath:application-local.yml")
+//@TestPropertySource(locations = "classpath:application-local.yml") 필요없음.
 @ActiveProfiles("local")
 public abstract class JpaUnitTest {
    /**
