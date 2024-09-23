@@ -1,9 +1,11 @@
 package jm.diamond;
 
+import jm.diamond.config.QueryDslConfig;
 import org.springframework.boot.test.autoconfigure.OverrideAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
@@ -23,6 +25,7 @@ import org.springframework.test.context.TestPropertySource;
 @ComponentScan(basePackages={"jm.diamond.dao"})
 //@TestPropertySource(locations = "classpath:application-local.yml") 필요없음.
 @ActiveProfiles("local")
+@Import({QueryDslConfig.class})
 public abstract class JpaUnitTest {
    /**
     * JUnit 4를 사용하는 경우, @RunWith(SpringRunner.class)를 테스트에 추가하는 것을 잊지 마세요.
