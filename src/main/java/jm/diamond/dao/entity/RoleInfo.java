@@ -45,10 +45,7 @@ public class RoleInfo {
 
    /** 등록자 */
    @ToString.Exclude
-   @ManyToOne(fetch = FetchType.LAZY)
-   @Setter
-   @JoinColumn(name = "regId")
-   private User registrationUser;
+   private String registrationUser;
 
    /** 등록일시 */
    @Column(name = "regDate")
@@ -57,10 +54,8 @@ public class RoleInfo {
 
    /** 수정자 */
    @ToString.Exclude
-   @ManyToOne(fetch = FetchType.LAZY)
    @Setter
-   @JoinColumn(name = "updId")
-   private User updateUser;
+   private String updateUser;
 
    /** 수정일시 */
    @Column(name = "updDate")

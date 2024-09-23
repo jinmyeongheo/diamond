@@ -28,28 +28,14 @@ import org.springframework.data.annotation.LastModifiedDate;
 public class UserRoleInfo {
    /** 사용자 일련 번호 */
    @Id
-   @NonNull
-   @EqualsAndHashCode.Include
-   @ToString.Exclude
-   @ManyToOne(fetch = FetchType.EAGER)
-   @JoinColumn(name = "seq")
-   private User user;
+   private String user;
 
    /** 역할 일련 번호 */
-   @Id
-   @NonNull
-   @EqualsAndHashCode.Include
-   @ToString.Exclude
-   @ManyToOne(fetch = FetchType.EAGER)
-   @JoinColumn(name = "roleSeq")
-   private RoleInfo role;
+   private Long role;
 
    /** 등록자 */
    @ToString.Exclude
-   @ManyToOne(fetch = FetchType.LAZY)
-   @JoinColumn(name = "regId")
-   @CreatedBy
-   private User registrationUser;
+   private String registrationUser;
 
    /** 등록일시 */
    @Column(name = "regDate")
@@ -58,10 +44,7 @@ public class UserRoleInfo {
 
    /** 수정자 */
    @ToString.Exclude
-   @ManyToOne(fetch = FetchType.LAZY)
-   @JoinColumn(name = "updId")
-   @LastModifiedBy
-   private User updateUser;
+   private String updateUser;
 
    /** 수정일시 */
    @Column(name = "updDate")

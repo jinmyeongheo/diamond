@@ -27,32 +27,14 @@ import org.springframework.data.annotation.CreatedDate;
 public class RolePrivilegeInfo {
    /** 역할 일련 번호 */
    @Id
-   @NonNull
-   @EqualsAndHashCode.Include
-   @ToString.Exclude
-   @ManyToOne(
-       fetch = FetchType.LAZY,
-       cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-   @JoinColumn(name = "roleSeq")
-   private RoleInfo role;
+   private Long role;
 
    /** 권한 ID */
-   @Id
-   @NonNull
-   @EqualsAndHashCode.Include
-   @ToString.Exclude
-   @ManyToOne(
-       fetch = FetchType.EAGER,
-       cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-   @JoinColumn(name = "privilegeSeq")
-   private PrivilegeInfo privilege;
+   private String privilege;
 
    /** 등록자 */
    @ToString.Exclude
-   @ManyToOne(fetch = FetchType.LAZY)
-   @Setter
-   @JoinColumn(name = "regId")
-   private User registrationUser;
+   private String registrationUser;
 
    /** 등록일시 */
    @Column(name = "regDate")

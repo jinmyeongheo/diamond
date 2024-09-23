@@ -23,25 +23,21 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-jpa</artifactId>
     </dependency>
+    <!-- querydsl-jpa: QueryDSL JPA 라이브러리-->
+    <dependency>
+      <groupId>com.querydsl</groupId>
+      <artifactId>querydsl-jpa</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>org.mariadb.jdbc</groupId>
-      <artifactId>mariadb-java-client</artifactId>
-      <scope>runtime</scope>
-    </dependency>
+
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-test</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -79,4 +75,33 @@
     </dependency>
 
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.mysema.maven</groupId>
+        <artifactId>apt-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>process</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>target/generated-sources/java</outputDirectory>
+              <processor>com.querydsl.apt.jpa.JPAAnnotationProcessor</processor>
+            </configuration>
+          </execution>
+        </executions>
+        <dependencies>
+          <!--    querydsl-apt: 쿼리 타입(Q-Class)을 생성할 때 필요-->
+          <dependency>
+            <groupId>com.querydsl</groupId>
+            <artifactId>querydsl-apt</artifactId>
+            <version>${querydsl.version}</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>

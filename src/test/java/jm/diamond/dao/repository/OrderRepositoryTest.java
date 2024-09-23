@@ -1,6 +1,7 @@
 package jm.diamond.dao.repository;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 import jm.diamond.JpaUnitTest;
 import jm.diamond.dao.entity.Order;
@@ -24,6 +25,9 @@ class OrderRepositoryTest extends JpaUnitTest {
       Order build = Order.builder().seq("210202"+i).payReqAmt(BigDecimal.ONE).build();
       Order save = orderRepository.save(build);
       save.plusPayReqAmt();
+
+      List<Order> orders = orderRepository.selectOrders();
+         System.out.println("orders = " + orders);
       testEntityManager.flush();
       }
       testEntityManager.clear();
@@ -36,6 +40,7 @@ class OrderRepositoryTest extends JpaUnitTest {
       }else{
          System.out.println("byId = " + byId.isPresent());
       }
+
 
    }
 

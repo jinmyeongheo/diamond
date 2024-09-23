@@ -3,7 +3,6 @@ package jm.diamond.security;
 import java.util.Optional;
 import jm.diamond.dao.entity.User;
 import jm.diamond.dao.repository.UserRepository;
-import jm.diamond.security.UserDto.UserDtoBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -21,7 +20,7 @@ public class CustomUserDetailService implements UserDetailsService {
         Optional<User> user = userRepository.findByEmail(email);
         if(user.isPresent()){
             User user1 = user.get();
-            UserDto userDto = new UserDtoBuilder()
+            UserDto userDto = UserDto.builder()
                 .seq(user1.getSeq())
                 .loginId(user1.getEmail())
                 .password(user1.getPw())
