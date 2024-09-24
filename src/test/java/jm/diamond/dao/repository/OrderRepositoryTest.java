@@ -21,25 +21,25 @@ class OrderRepositoryTest extends JpaUnitTest {
    @Test
    void test(){
 
-      for (int i = 0; i < 100; i++) {
-      Order build = Order.builder().seq("210202"+i).payReqAmt(BigDecimal.ONE).build();
-      Order save = orderRepository.save(build);
-      save.plusPayReqAmt();
-
       List<Order> orders = orderRepository.selectOrders();
-         System.out.println("orders = " + orders);
-      testEntityManager.flush();
-      }
-      testEntityManager.clear();
+      System.out.println("orders = " + orders);
 
-      Optional<Order> byId =
-          orderRepository.findById("2102020");
-
-      if(byId.isPresent()){
-         System.out.println("byId = " + byId.get().getSeq());
-      }else{
-         System.out.println("byId = " + byId.isPresent());
-      }
+//      for (int i = 0; i < 100; i++) {
+//      Order build = Order.builder().seq("210202"+i).payReqAmt(BigDecimal.ONE).build();
+//      Order save = orderRepository.save(build);
+//      save.plusPayReqAmt();
+//      testEntityManager.flush();
+//      }
+//      testEntityManager.clear();
+//
+//      Optional<Order> byId =
+//          orderRepository.findById("2102020");
+//
+//      if(byId.isPresent()){
+//         System.out.println("byId = " + byId.get().getSeq());
+//      }else{
+//         System.out.println("byId = " + byId.isPresent());
+//      }
 
 
    }

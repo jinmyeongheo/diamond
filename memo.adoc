@@ -1,0 +1,22 @@
+더미데이터
+
+DELIMITER $$
+
+CREATE PROCEDURE insert_dummy_data(IN total_rows INT)
+BEGIN
+    DECLARE i INT DEFAULT 1;
+
+    -- 루프를 사용하여 반복적으로 데이터를 삽입
+    WHILE i <= total_rows DO
+            INSERT INTO sample (id, Author_name, country)
+            VALUES (i, CONCAT('Name', i), CONCAT('country',i)); -- 이름은 'Name' + i, 나이는 20~50 사이의 임의 값
+            SET i = i + 1;
+        END WHILE;
+
+END$$
+
+DELIMITER ;
+
+CALL insert_dummy_data(10000);
+DROP PROCEDURE IF EXISTS insert_dummy_data;
+
