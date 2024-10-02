@@ -42,164 +42,165 @@ https://gimquokka.github.io/spring%20data/Querydsl%EC%9D%84-%ED%99%9C%EC%9A%A9%E
 
 
 
--- Users 테이블
-CREATE TABLE Users (
-                       id INT AUTO_INCREMENT PRIMARY KEY,
-                       username VARCHAR(255) NOT NULL,
-                       password VARCHAR(255) NOT NULL,
-                       email VARCHAR(255) NOT NULL,
-                       phone VARCHAR(20),
-                       role ENUM('CUSTOMER', 'SELLER', 'ADMIN') NOT NULL,
-                       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+-- User 테이블 (사용자 정보)
+CREATE TABLE User (
+                      id INT AUTO_INCREMENT PRIMARY KEY,
+                      username VARCHAR(255) NOT NULL,
+                      password VARCHAR(255) NOT NULL,
+                      email VARCHAR(255) NOT NULL,
+                      phone VARCHAR(20),
+                      role ENUM('CUSTOMER', 'SELLER', 'ADMIN') NOT NULL,
+                      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Products 테이블
-CREATE TABLE Products (
+-- Category 테이블 (카테고리 정보)
+CREATE TABLE Category (
                           id INT AUTO_INCREMENT PRIMARY KEY,
                           name VARCHAR(255) NOT NULL,
-                          description TEXT,
-                          price DECIMAL(10, 2) NOT NULL,
-                          stock INT NOT NULL,
-                          category_id INT,
-                          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                          FOREIGN KEY (category_id) REFERENCES Categories(id)
+                          description TEXT
 );
 
--- Categories 테이블
-CREATE TABLE Categories (
+-- Product 테이블 (상품 정보)
+CREATE TABLE Product (
+                         id INT AUTO_INCREMENT PRIMARY KEY,
+                         name VARCHAR(255) NOT NULL,
+                         description TEXT,
+                         price DECIMAL(10, 2) NOT NULL,
+                         stock INT NOT NULL,
+                         category_id INT,
+                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                         FOREIGN KEY (category_id) REFERENCES Category(id)
+);
+
+
+
+-- Order 테이블 (주문 정보)
+CREATE TABLE Order_Info (
+                       id INT AUTO_INCREMENT PRIMARY KEY,
+                       user_id INT,
+                       order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                       total_amount DECIMAL(10, 2) NOT NULL,
+                       status ENUM('PENDING', 'COMPLETED', 'SHIPPING', 'DELIVERED', 'CANCELED') NOT NULL,
+                       payment_method VARCHAR(50),
+                       FOREIGN KEY (user_id) REFERENCES User(id)
+);
+
+-- Order_Item 테이블 (주문 상품 정보)
+CREATE TABLE Order_Item (
                             id INT AUTO_INCREMENT PRIMARY KEY,
-                            name VARCHAR(255) NOT NULL,
-                            description TEXT
+                            order_id INT,
+                            product_id INT,
+                            quantity INT NOT NULL,
+                            price DECIMAL(10, 2) NOT NULL,
+                            total_price DECIMAL(10, 2) NOT NULL,
+                            FOREIGN KEY (order_id) REFERENCES Order_Info(id),
+                            FOREIGN KEY (product_id) REFERENCES Product(id)
 );
 
--- Orders 테이블
-CREATE TABLE Orders (
+-- Shopping_Cart 테이블 (장바구니 정보)
+CREATE TABLE Shopping_Cart (
+                               id INT AUTO_INCREMENT PRIMARY KEY,
+                               user_id INT,
+                               product_id INT,
+                               quantity INT NOT NULL,
+                               added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                               FOREIGN KEY (user_id) REFERENCES User(id),
+                               FOREIGN KEY (product_id) REFERENCES Product(id)
+);
+
+-- Payment 테이블 (결제 정보)
+CREATE TABLE Payment (
+                         id INT AUTO_INCREMENT PRIMARY KEY,
+                         order_id INT,
+                         payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                         amount DECIMAL(10, 2) NOT NULL,
+                         payment_method VARCHAR(50),
+                         status ENUM('SUCCESS', 'FAILED', 'PENDING') NOT NULL,
+                         FOREIGN KEY (order_id) REFERENCES Order_Info(id)
+);
+
+-- Address 테이블 (사용자 주소 정보)
+CREATE TABLE Address (
+                         id INT AUTO_INCREMENT PRIMARY KEY,
+                         user_id INT,
+                         recipient_name VARCHAR(255) NOT NULL,
+                         address_line1 VARCHAR(255) NOT NULL,
+                         address_line2 VARCHAR(255),
+                         city VARCHAR(100) NOT NULL,
+                         postal_code VARCHAR(20) NOT NULL,
+                         phone VARCHAR(20) NOT NULL,
+                         FOREIGN KEY (user_id) REFERENCES User(id)
+);
+
+-- Review 테이블 (리뷰 정보)
+CREATE TABLE Review (
                         id INT AUTO_INCREMENT PRIMARY KEY,
                         user_id INT,
-                        order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        total_amount DECIMAL(10, 2) NOT NULL,
-                        status ENUM('PENDING', 'COMPLETED', 'SHIPPING', 'DELIVERED', 'CANCELED') NOT NULL,
-                        payment_method VARCHAR(50),
-                        FOREIGN KEY (user_id) REFERENCES Users(id)
+                        product_id INT,
+                        rating INT CHECK (rating BETWEEN 1 AND 5),
+                        comment TEXT,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (user_id) REFERENCES User(id),
+                        FOREIGN KEY (product_id) REFERENCES Product(id)
 );
 
--- Order_Items 테이블
-CREATE TABLE Order_Items (
-                             id INT AUTO_INCREMENT PRIMARY KEY,
-                             order_id INT,
-                             product_id INT,
-                             quantity INT NOT NULL,
-                             price DECIMAL(10, 2) NOT NULL,
-                             total_price DECIMAL(10, 2) NOT NULL,
-                             FOREIGN KEY (order_id) REFERENCES Orders(id),
-                             FOREIGN KEY (product_id) REFERENCES Products(id)
-);
-
--- Shopping_Carts 테이블
-CREATE TABLE Shopping_Carts (
-                                id INT AUTO_INCREMENT PRIMARY KEY,
-                                user_id INT,
-                                product_id INT,
-                                quantity INT NOT NULL,
-                                added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                FOREIGN KEY (user_id) REFERENCES Users(id),
-                                FOREIGN KEY (product_id) REFERENCES Products(id)
-);
-
--- Payments 테이블
-CREATE TABLE Payments (
+-- Wishlist 테이블 (위시리스트 정보)
+CREATE TABLE Wishlist (
                           id INT AUTO_INCREMENT PRIMARY KEY,
-                          order_id INT,
-                          payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                          amount DECIMAL(10, 2) NOT NULL,
-                          payment_method VARCHAR(50),
-                          status ENUM('SUCCESS', 'FAILED', 'PENDING') NOT NULL,
-                          FOREIGN KEY (order_id) REFERENCES Orders(id)
+                          user_id INT,
+                          product_id INT,
+                          added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                          FOREIGN KEY (user_id) REFERENCES User(id),
+                          FOREIGN KEY (product_id) REFERENCES Product(id)
 );
 
--- Addresses 테이블
-CREATE TABLE Addresses (
-                           id INT AUTO_INCREMENT PRIMARY KEY,
-                           user_id INT,
-                           recipient_name VARCHAR(255) NOT NULL,
-                           address_line1 VARCHAR(255) NOT NULL,
-                           address_line2 VARCHAR(255),
-                           city VARCHAR(100) NOT NULL,
-                           postal_code VARCHAR(20) NOT NULL,
-                           phone VARCHAR(20) NOT NULL,
-                           FOREIGN KEY (user_id) REFERENCES Users(id)
+-- Product_Image 테이블 (상품 이미지 정보)
+CREATE TABLE Product_Image (
+                               id INT AUTO_INCREMENT PRIMARY KEY,
+                               product_id INT,
+                               image_url VARCHAR(255) NOT NULL,
+                               created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                               FOREIGN KEY (product_id) REFERENCES Product(id)
 );
 
--- Reviews 테이블
-CREATE TABLE Reviews (
-                         id INT AUTO_INCREMENT PRIMARY KEY,
-                         user_id INT,
-                         product_id INT,
-                         rating INT CHECK (rating BETWEEN 1 AND 5),
-                         comment TEXT,
-                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                         FOREIGN KEY (user_id) REFERENCES Users(id),
-                         FOREIGN KEY (product_id) REFERENCES Products(id)
+-- Coupon 테이블 (쿠폰 정보)
+CREATE TABLE Coupon (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        code VARCHAR(50) NOT NULL,
+                        discount_amount DECIMAL(10, 2) NOT NULL,
+                        valid_from DATE NOT NULL,
+                        valid_to DATE NOT NULL,
+                        user_id INT,
+                        FOREIGN KEY (user_id) REFERENCES User(id) ON DELETE SET NULL
 );
 
--- Wishlists 테이블
-CREATE TABLE Wishlists (
-                           id INT AUTO_INCREMENT PRIMARY KEY,
-                           user_id INT,
-                           product_id INT,
-                           added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                           FOREIGN KEY (user_id) REFERENCES Users(id),
-                           FOREIGN KEY (product_id) REFERENCES Products(id)
+-- Merchant 테이블 (가맹점 정보)
+CREATE TABLE Merchant (
+                          id INT AUTO_INCREMENT PRIMARY KEY,
+                          name VARCHAR(255) NOT NULL,
+                          email VARCHAR(255) NOT NULL,
+                          phone VARCHAR(20),
+                          address VARCHAR(255),
+                          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                          status ENUM('ACTIVE', 'INACTIVE') NOT NULL DEFAULT 'ACTIVE'
 );
 
--- Product_Images 테이블
-CREATE TABLE Product_Images (
-                                id INT AUTO_INCREMENT PRIMARY KEY,
-                                product_id INT,
-                                image_url VARCHAR(255) NOT NULL,
-                                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                FOREIGN KEY (product_id) REFERENCES Products(id)
+-- Merchant_Product 테이블 (가맹점과 상품 간의 관계)
+CREATE TABLE Merchant_Product (
+                                  merchant_id INT,
+                                  product_id INT,
+                                  PRIMARY KEY (merchant_id, product_id),
+                                  FOREIGN KEY (merchant_id) REFERENCES Merchant(id) ON DELETE CASCADE,
+                                  FOREIGN KEY (product_id) REFERENCES Product(id) ON DELETE CASCADE
 );
 
--- Coupons 테이블
-CREATE TABLE Coupons (
-                         id INT AUTO_INCREMENT PRIMARY KEY,
-                         code VARCHAR(50) NOT NULL,
-                         discount_amount DECIMAL(10, 2) NOT NULL,
-                         valid_from DATE NOT NULL,
-                         valid_to DATE NOT NULL,
-                         user_id INT,
-                         FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE SET NULL
-);
-
-
--- Merchants 테이블 (가맹점 정보)
-CREATE TABLE Merchants (
-                           id INT AUTO_INCREMENT PRIMARY KEY,
-                           name VARCHAR(255) NOT NULL,
-                           email VARCHAR(255) NOT NULL,
-                           phone VARCHAR(20),
-                           address VARCHAR(255),
-                           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                           status ENUM('ACTIVE', 'INACTIVE') NOT NULL DEFAULT 'ACTIVE'
-);
-
--- Merchant_Products 테이블 (가맹점과 상품 간의 관계)
-CREATE TABLE Merchant_Products (
-                                   merchant_id INT,
-                                   product_id INT,
-                                   PRIMARY KEY (merchant_id, product_id),
-                                   FOREIGN KEY (merchant_id) REFERENCES Merchants(id) ON DELETE CASCADE,
-                                   FOREIGN KEY (product_id) REFERENCES Products(id) ON DELETE CASCADE
-);
-
--- Settlements 테이블 (정산 내역)
-CREATE TABLE Settlements (
-                             id INT AUTO_INCREMENT PRIMARY KEY,
-                             merchant_id INT,
-                             total_sales DECIMAL(15, 2) NOT NULL,
-                             settlement_amount DECIMAL(15, 2) NOT NULL,
-                             settlement_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                             FOREIGN KEY (merchant_id) REFERENCES Merchants(id)
+-- Settlement 테이블 (정산 내역)
+CREATE TABLE Settlement (
+                            id INT AUTO_INCREMENT PRIMARY KEY,
+                            merchant_id INT,
+                            total_sales DECIMAL(15, 2) NOT NULL,
+                            settlement_amount DECIMAL(15, 2) NOT NULL,
+                            settlement_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                            FOREIGN KEY (merchant_id) REFERENCES Merchant(id)
 );
