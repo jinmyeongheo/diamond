@@ -39,6 +39,8 @@ JOIN 을 활용한 페이징
 
 https://velog.io/@claraqn/%EA%B3%A0%EB%AF%BC-%EC%BB%AC%EB%9F%BC-%EC%88%98%EC%97%90-%EB%94%B0%EB%A5%B8-%EC%84%B1%EB%8A%A5-%EC%B0%A8%EC%9D%B4
 https://gimquokka.github.io/spring%20data/Querydsl%EC%9D%84-%ED%99%9C%EC%9A%A9%ED%95%9C-%EB%B3%B5%EC%9E%A1%ED%95%9C-%EB%8F%99%EC%A0%81%EC%BF%BC%EB%A6%AC-%EA%B5%AC%ED%98%84%EA%B8%B0/
+운체
+https://blockdmask.tistory.com/69
 
 
 
