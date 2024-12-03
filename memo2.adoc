@@ -1,0 +1,15 @@
+was -> httpReq,httpRes -> dispatcherServlet -> getHandler(컨트롤러) 
+-> getHandlerAdapter -> adpater를 이용해서 handler 실행전 -> (handler)inertceptor 실행 applyPreHandle 
+-> 모든 interceptor 통과 -> handlerAdpater로 handle() 메소드 실행 -> handle을 실행하기 위한 파리미터를 위해 argumentResolver실행 -> controller 호출 -> 
+postHandle 인터셉터 실행 -> result 응답
+
+서블릿(Servlet)은 클라이언트 요청을 처리하고, 그 결과를 반환하는 웹 프로그래밍 기술
+스프링mvc에서는 http 메세지를 읽고 응답을 만들어주는 역할을 하며 개발자는 비즈니스 로직에만 집중
+톰캣(서블릿 컨테이너) 서블릿 객체를 생성, 초기화, 호출, 종료하는 생명주기 관리 싱글톤
+동시 요청을 위한 멀티 쓰레드 처리 지원
+
+argumentResolver 컨트롤러에서 요청 데이터에 대해 공통으로 처리해야하는 로직이 있을 때 사용하면 좋음.
+전략인터페이스, 요청데이터 앞의 어노테이션을 보고 바인딩여부를 결정함.
+어노테이션 커스텀해서 파리미터 바인딩할 수 있음. 인증, 인가 등..
+
+생성자주입을 권장하는 이유. 필드의 불변성, 순환참조방지, 싱글톤,
