@@ -1,4 +1,4 @@
-was -> httpReq,httpRes -> dispatcherServlet -> getHandler(컨트롤러) 
+tomcat -> httpReq,httpRes -> dispatcherServlet -> getHandler(컨트롤러)
 -> getHandlerAdapter -> adpater를 이용해서 handler 실행전 -> (handler)inertceptor 실행 applyPreHandle 
 -> 모든 interceptor 통과 -> handlerAdpater로 handle() 메소드 실행 ->
 handle을 실행하기 위한 파리미터를 생성위해 argumentResolver실행
@@ -24,4 +24,19 @@ Java 가상 머신(JVM) 설정에 따라 mod_proxy 및 mod_jk와 같은 전통�
 tomcat ( catalina(servlet container) + coyote(http component) + jsp)
 
 
-toll
+tomcat outputstream 차면 flush 해줌.
+
+jdbc가 하는것
+tcp/ip소캣통신
+db 프로토콜 준수
+타입변환 java -> db
+궁금하면 보자
+https://dev.mysql.com/doc/connector-j/en/
+
+
+JDBC 기능 중 직접 구현할 만한 것:
+Connection Pool 직접 설계 및 구현.(커넥션 관리)
+Statement와 PreparedStatement의 차이를 구현해 보여주는 샘플 코드 작성.
+SQL 실행 및 쿼리 파싱.
+트랜잭션 처리.
+데이터베이스 예외 처리
