@@ -7,13 +7,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import jm.diamond.JpaUnitTest;
-import jm.diamond.dao.entity.Order;
+import jm.diamond.dao.entity.OrderInfo;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 
-class OrderRepositoryTest extends JpaUnitTest {
+class OrderInfoRepositoryTest extends JpaUnitTest {
 
    @Autowired
    private TestEntityManager testEntityManager;
@@ -24,21 +24,23 @@ class OrderRepositoryTest extends JpaUnitTest {
    @Test
    void test(){
 
-      List<Order> orders = orderRepository.selectOrders();
-      System.out.println("orders = " + orders);
+      List<OrderInfo> orderInfos = orderRepository.selectOrders();
+      List<OrderInfo> all = orderRepository.findAll();
+      System.out.println("all = " + all);
+      System.out.println("orders = " + orderInfos);
 
 
       // Given
-      Order order = Order.builder()
+      OrderInfo orderInfo = OrderInfo.builder()
           .paymentMethod("1")
           .status("1")
-          .totalAmount(BigDecimal.ONE)
-          .orderDate(LocalDateTime.now())
+          .amount(BigDecimal.ONE)
+          .orderDateTime(LocalDateTime.now())
           .build();
-      Order save = orderRepository.save(order);
+      OrderInfo save = orderRepository.save(orderInfo);
 
       // When
-      Optional<Order> byId = orderRepository.findById(save.getId());
+      Optional<OrderInfo> byId = orderRepository.findById(save.getId());
 
 
 

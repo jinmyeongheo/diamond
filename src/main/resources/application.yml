@@ -9,11 +9,11 @@ spring:
     database-platform: org.hibernate.dialect.MySQLDialect
     hibernate:
       naming:
-        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
+        physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
+        implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
     properties: # Difference between spring.jpa.properties.hibernate and spring.jpa.hibernate
       hibernate:
-        ddl-auto: create
+        ddl-auto: none
 #        show-sql: true
 #        format_sql: true
 #        use_sql_comments: true
@@ -29,4 +29,3 @@ logging:
     org:
       hibernate:
         sql : debug
-        type : trace
