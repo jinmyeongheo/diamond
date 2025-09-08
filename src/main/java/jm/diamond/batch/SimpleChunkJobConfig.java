@@ -1,5 +1,13 @@
 package jm.diamond.batch;
 
+import com.querydsl.core.BooleanBuilder;
+import jm.diamond.batch.reader.modn.reader.QuerydslNoOffsetPagingItemReader;
+import jm.diamond.batch.reader.modn.reader.QuerydslPagingItemReader;
+import jm.diamond.batch.reader.modn.reader.expression.Expression;
+import jm.diamond.batch.reader.modn.reader.options.QuerydslNoOffsetNumberOptions;
+import jm.diamond.batch.reader.modn.reader.options.QuerydslNoOffsetOptions;
+import jm.diamond.batch.reader.modn.reader.options.QuerydslNoOffsetStringOptions;
+import jm.diamond.dao.entity.OrderInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -13,7 +21,10 @@ import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.persistence.EntityManagerFactory;
 import java.util.ArrayList;
+
+import static jm.diamond.dao.entity.QOrderInfo.orderInfo;
 
 @Slf4j
 @Configuration
@@ -22,6 +33,7 @@ public class SimpleChunkJobConfig {
 
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
+    private final EntityManagerFactory emf;
 
 
     @Bean
@@ -34,7 +46,7 @@ public class SimpleChunkJobConfig {
     @Bean
     public Step simpleChunkStep() {
         return stepBuilderFactory.get("simpleChunkStep")
-                .<String, String>chunk(3) // 3개 단위로 처리
+                .<OrderInfo, OrderInfo>chunk(3) // 3개 단위로 처리
                 .reader(itemReader())
                 .processor(itemProcessor())
                 .writer(itemWriter())
@@ -42,8 +54,19 @@ public class SimpleChunkJobConfig {
     }
 
     @Bean
-    public ItemReader<String> itemReader() {
-        return new ListItemReader<>(new ArrayList<>());
+    public QuerydslPagingItemReader<OrderInfo> itemReader() {
+
+        QuerydslNoOffsetNumberOptions<Object, Long> options =
+                new QuerydslNoOffsetNumberOptions<>(orderInfo.id, Expression.ASC);
+
+        BooleanBuilder where =
+                new BooleanBuilder()
+                        .and(orderInfo.id.in(123));
+
+
+        int CHUNK_SIZE = 100;
+        return new QuerydslNoOffsetPagingItemReader<>(
+                emf, CHUNK_SIZE, options, q -> q.selectFrom(orderInfo).where(where));
     }
 
     @Bean

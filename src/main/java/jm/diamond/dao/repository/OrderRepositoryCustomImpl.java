@@ -7,7 +7,8 @@ import jm.diamond.dao.entity.OrderInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import static jm.diamond.dao.entity.QOrder.order;
+import static jm.diamond.dao.entity.QOrderInfo.orderInfo;
+
 
 @Repository
 @RequiredArgsConstructor
@@ -16,6 +17,6 @@ public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
 
    @Override
    public List<OrderInfo> selectOrders() {
-      return jpaQueryFactory.selectFrom(order).fetch();
+      return jpaQueryFactory.selectFrom(orderInfo).fetch();
    }
 }
