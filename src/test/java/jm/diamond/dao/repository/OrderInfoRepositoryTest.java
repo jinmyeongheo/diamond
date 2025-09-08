@@ -19,13 +19,13 @@ class OrderInfoRepositoryTest extends JpaUnitTest {
    private TestEntityManager testEntityManager;
 
    @Autowired
-   private OrderRepository orderRepository;
+   private OrderInfoRepository orderInfoRepository;
 
    @Test
    void test(){
 
-      List<OrderInfo> orderInfos = orderRepository.selectOrders();
-      List<OrderInfo> all = orderRepository.findAll();
+      List<OrderInfo> orderInfos = orderInfoRepository.selectOrders();
+      List<OrderInfo> all = orderInfoRepository.findAll();
       System.out.println("all = " + all);
       System.out.println("orders = " + orderInfos);
 
@@ -37,10 +37,10 @@ class OrderInfoRepositoryTest extends JpaUnitTest {
           .amount(BigDecimal.ONE)
           .orderDateTime(LocalDateTime.now())
           .build();
-      OrderInfo save = orderRepository.save(orderInfo);
+      OrderInfo save = orderInfoRepository.save(orderInfo);
 
       // When
-      Optional<OrderInfo> byId = orderRepository.findById(save.getId());
+      Optional<OrderInfo> byId = orderInfoRepository.findById(save.getId());
 
 
 

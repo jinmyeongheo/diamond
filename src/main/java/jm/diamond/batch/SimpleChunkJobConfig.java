@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import static jm.diamond.dao.entity.QOrderInfo.orderInfo;
 
 @Slf4j
-@Configuration
+//@Configuration
 @RequiredArgsConstructor
 public class SimpleChunkJobConfig {
 
@@ -56,7 +56,7 @@ public class SimpleChunkJobConfig {
     @Bean
     public QuerydslPagingItemReader<OrderInfo> itemReader() {
 
-        QuerydslNoOffsetNumberOptions<Object, Long> options =
+        QuerydslNoOffsetNumberOptions<OrderInfo, Long> options =
                 new QuerydslNoOffsetNumberOptions<>(orderInfo.id, Expression.ASC);
 
         BooleanBuilder where =
@@ -70,14 +70,14 @@ public class SimpleChunkJobConfig {
     }
 
     @Bean
-    public ItemProcessor<String, String> itemProcessor() {
-        return item -> item.toUpperCase(); // 간단히 대문자로 변환
+    public ItemProcessor<OrderInfo, OrderInfo> itemProcessor() {
+        return item -> item; // 간단히 대문자로 변환
     }
 
     @Bean
-    public ItemWriter<String> itemWriter() {
+    public ItemWriter<OrderInfo> itemWriter() {
         return items -> {
-            System.out.println("쓰기: " + items);
+            log.info("쓰기: " + items.get(0).getId());
         };
     }
 }
