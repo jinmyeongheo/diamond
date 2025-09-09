@@ -16,6 +16,14 @@ values
     (5000.00, 'KAKAOPAY', 'CANCELLED', now() - interval 2 day);
 
 
+create table payment_base_info
+(
+    id                bigint                      not null comment '거래id',
+    amount                  decimal(15, 2)              null comment '거래금액',
+    primary key (id)
+);
+
+
 -- 현재 세션의 트랜잭션 격리 수준 확인
 SELECT @@transaction_isolation;
 

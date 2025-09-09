@@ -26,9 +26,9 @@ public class TestConfig {
     //운영 예측: USL(Universal Scalability Law) 같은 모델로 스테이징 수치를 운영 코어/메모리 스펙에 맞게 확대.
 
 
-//    Micrometer → “잡/스텝/청크 처리량, commit 시간”을 계측
-//
-//  Prometheus → 그 수치를 초 단위로 기록
-//
-//Grafana → 성능 추세를 시각적으로 확인
+    //    Micrometer → “잡/스텝/청크 처리량, commit 시간”을 계측
+    //
+    //  Prometheus → 그 수치를 초 단위로 기록
+    //
+    //Grafana → 성능 추세를 시각적으로 확인
 }

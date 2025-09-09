@@ -1,61 +1,54 @@
 package jm.diamond.batch;
 
-import java.util.List;
-import jm.diamond.dao.entity.OrderInfo;
-import jm.diamond.dao.repository.OrderInfoRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.batch.test.JobRepositoryTestUtils;
 import org.springframework.batch.test.context.SpringBatchTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.PlatformTransactionManager;
+
+import javax.persistence.EntityManagerFactory;
+
+import java.time.LocalDate;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
-@SpringBootTest
-//@SpringBatchTest
+@SpringBatchTest
 @ActiveProfiles("local")
+@SpringBootTest(classes={SimpleChunkJobConfig.class, TestBatchConfig.class})
 class SimpleChunkJobConfigTest {
 
-//    @Autowired
-//    private JobLauncherTestUtils jobLauncherTestUtils;
-
-    @Autowired
-    private ApplicationContext applicationContext;
-
-    @Autowired
-    private OrderInfoRepository orderInfoRepository;
+    @Autowired private JobLauncherTestUtils jobLauncherTestUtils;
+    @Autowired private JobRepositoryTestUtils jobRepositoryTestUtils;
+    @Autowired private EntityManagerFactory emf;
 
     @Test
-    void JDBC_커넥션_테스트(){
-        List<OrderInfo> all =
-            orderInfoRepository.findAll();
+    void test() throws Exception {
+
+        //given
+        LocalDate orderDate = LocalDate.of(2019,10,6);
+        int amount1 = 1000;
+        int amount2 = 500;
+        int amount3 = 100;
+
+
+        JobParameters jobParameters = new JobParametersBuilder()
+                .addString("power", "hello")
+                .toJobParameters();
+
+        // when
+        JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
+
+        // then
+        assertThat(jobExecution.getStatus()).isEqualTo(BatchStatus.COMPLETED);
+
+        System.out.println("true = " + true);
     }
-
-    @Test
-    void checkTransactionManager() { // JpaTransactionManager는 같은 DataSource를 쓰는 plain JDBC 접근(= MyBatis/JdbcTemplate 등)을 동일 트랜잭션에 참여시킬 수 있습니다
-        PlatformTransactionManager txManager =
-            applicationContext.getBean(PlatformTransactionManager.class);
-
-        System.out.println(">>> TransactionManager class = " + txManager.getClass().getName());
-    }
-
-//    @Test
-//    void 한글로_테스트_해요() throws Exception {
-//
-//        // when
-//        JobExecution jobExecution = jobLauncherTestUtils.launchJob();
-//
-//        // then
-//        assertThat(jobExecution.getStatus()).isEqualTo(BatchStatus.COMPLETED);
-//
-//        System.out.println("true = " + true);
-//    }
 }
