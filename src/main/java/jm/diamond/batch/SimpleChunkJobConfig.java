@@ -20,6 +20,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder;
+import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -52,6 +53,7 @@ public class SimpleChunkJobConfig {
                 .reader(itemReader())
                 .processor(itemProcessor())
                 .writer(itemWriter())
+                .transactionManager(new ResourcelessTransactionManager())
                 .build();
     }
 
