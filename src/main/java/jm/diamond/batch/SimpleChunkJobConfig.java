@@ -5,8 +5,6 @@ import jm.diamond.batch.reader.modn.reader.QuerydslNoOffsetPagingItemReader;
 import jm.diamond.batch.reader.modn.reader.QuerydslPagingItemReader;
 import jm.diamond.batch.reader.modn.reader.expression.Expression;
 import jm.diamond.batch.reader.modn.reader.options.QuerydslNoOffsetNumberOptions;
-import jm.diamond.batch.reader.modn.reader.options.QuerydslNoOffsetOptions;
-import jm.diamond.batch.reader.modn.reader.options.QuerydslNoOffsetStringOptions;
 import jm.diamond.dao.entity.OrderInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,14 +13,10 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import javax.persistence.EntityManagerFactory;
-import java.util.ArrayList;
 
 import static jm.diamond.dao.entity.QOrderInfo.orderInfo;
 
