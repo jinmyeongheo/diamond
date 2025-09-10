@@ -1,5 +1,6 @@
 package jm.diamond.batch;
 
+import jm.diamond.config.QueryDslConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.batch.core.BatchStatus;
@@ -11,6 +12,7 @@ import org.springframework.batch.test.JobRepositoryTestUtils;
 import org.springframework.batch.test.context.SpringBatchTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.persistence.EntityManagerFactory;
@@ -23,6 +25,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @SpringBatchTest
 @ActiveProfiles("local")
 @SpringBootTest(classes={SimpleChunkJobConfig.class, TestBatchConfig.class})
+@Import({QueryDslConfig.class })
 class SimpleChunkJobConfigTest {
 
     @Autowired private JobLauncherTestUtils jobLauncherTestUtils;

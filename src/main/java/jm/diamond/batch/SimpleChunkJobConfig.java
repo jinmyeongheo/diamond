@@ -53,7 +53,7 @@ public class SimpleChunkJobConfig {
                 .reader(itemReader())
                 .processor(itemProcessor())
                 .writer(itemWriter())
-                .transactionManager(new ResourcelessTransactionManager())
+//                .transactionManager(new ResourcelessTransactionManager())
                 .build();
     }
 

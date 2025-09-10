@@ -18,9 +18,9 @@ values
 
 create table payment_base_info
 (
-    id                bigint                      not null comment '거래id',
-    amount                  decimal(15, 2)              null comment '거래금액',
-    primary key (id)
+    id     bigint auto_increment comment '거래id'
+        primary key,
+    amount decimal(15, 2) null comment '거래금액'
 );
 
 
