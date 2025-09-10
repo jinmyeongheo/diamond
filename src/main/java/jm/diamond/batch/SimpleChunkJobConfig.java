@@ -1,10 +1,5 @@
 package jm.diamond.batch;
 
-import com.querydsl.core.BooleanBuilder;
-import jm.diamond.batch.reader.modn.reader.QuerydslNoOffsetPagingItemReader;
-import jm.diamond.batch.reader.modn.reader.QuerydslPagingItemReader;
-import jm.diamond.batch.reader.modn.reader.expression.Expression;
-import jm.diamond.batch.reader.modn.reader.options.QuerydslNoOffsetNumberOptions;
 import jm.diamond.dao.entity.OrderInfo;
 import jm.diamond.dao.entity.PaymentBaseInfo;
 import lombok.RequiredArgsConstructor;
@@ -16,11 +11,9 @@ import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder;
-import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -88,7 +81,6 @@ public class SimpleChunkJobConfig {
     }
 
     @Bean
-    @StepScope
     public ItemProcessor<OrderInfo, PaymentBaseInfo> itemProcessor() {
         return item -> new PaymentBaseInfo(item.getId(), item.getAmount()); // 간단히 대문자로 변환
     }

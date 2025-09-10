@@ -18,6 +18,7 @@ import org.springframework.test.context.ActiveProfiles;
 import javax.persistence.EntityManagerFactory;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -41,9 +42,9 @@ class SimpleChunkJobConfigTest {
         int amount2 = 500;
         int amount3 = 100;
 
-
+        String orderDateString = LocalDateTime.now().toString();
         JobParameters jobParameters = new JobParametersBuilder()
-                .addString("power", "hello")
+                .addString("power", orderDateString)
                 .toJobParameters();
 
         // when
