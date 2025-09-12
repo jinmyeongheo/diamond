@@ -14,6 +14,28 @@ spring:
       minimum-idle: 5     # max보다 작게
       max-lifetime: 180000
       idle-timeout: 60000  # 1분 (원하면 유지)
+  batch:
+    job:
+      enabled: false
+  quartz:
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceName: modnpay-batch-scheduler2
+            instanceId: AUTO
+            makeSchedulerThreadDaemon: true
+            interruptJobsOnShutdown: true
+          jobStore:
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+            useProperties: false
+            clusterCheckinInterval: 20000
+            misfireThreshold: 60000
+            tablePrefix: QRTZ_
+            isClustered: true
+        threadpool:
+          makethreadsdaemons: true
+          threadCount: 5
 #  h2:
 #    console:
 #      enabled: false
