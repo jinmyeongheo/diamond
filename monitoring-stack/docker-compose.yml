@@ -1,0 +1,93 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mall-mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mall
+      MYSQL_ROOT_HOST: "%"
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-authentication-plugin=mysql_native_password
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d
+
+  mysqld-exporter:
+    image: prom/mysqld-exporter:latest
+    container_name: mall-mysqld-exporter
+    depends_on:
+      - mysql
+    # Prometheus가 긁어갈 포트
+    ports:
+      - "9104:9104"
+    environment:
+      # DSN: user:pass@(host:port)/
+      DATA_SOURCE_NAME: "root:root@(mysql:3306)/mall"
+      # 유용한 컬렉터 예시(필요 시 주석 해제)
+      # -collect.info_schema.processlist
+      # -collect.info_schema.innodb_tablespaces
+      # -collect.info_schema.innodb_metrics
+      # -collect.perf_schema.tableiowaits
+      # -collect.perf_schema.eventsstatements
+      #    필요에 따라 성능/상태를 더 깊게 보려면 “Collector”를 켜야 함.
+      #    info_schema.processlist: 현재 실행 중인 쿼리 상태 모니터링.
+      #    info_schema.innodb_tablespaces: InnoDB 테이블스페이스 상태.
+      #    info_schema.innodb_metrics: InnoDB 내부 지표(락, 버퍼 풀 등).
+      #    perf_schema.tableiowaits: 테이블 단위 I/O 대기 시간.
+      #    perf_schema.eventsstatements: SQL 실행 이벤트(어떤 쿼리가 얼마나 실행되는지).
+      #    단점: Collector를 많이 켜면 MySQL 부하가 늘 수 있음 → 필요한 것만 선택.
+    command:
+      - --log.level=info
+      # 필요한 컬렉터만 선택하고 싶다면 아래처럼 추가
+      # - --collect.info_schema.processlist
+      # - --collect.perf_schema.eventsstatements
+    restart: unless-stopped
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.53.0
+    container_name: cadvisor
+    privileged: true
+    devices:
+      - /dev/kmsg
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    ports:
+      - "8080:8080"
+    networks: [mon]
+    # 호스트의 Docker 엔진을 관찰하므로 Linux에서 가장 잘 동작
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=15d
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./volumes/prometheus:/prometheus
+    ports:
+      - "9090:9090"
+    depends_on: [cadvisor, mysqld-exporter]
+    networks: [mon]
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./volumes/grafana:/var/lib/grafana
+    depends_on: [prometheus]
+    networks: [mon]
+
+networks:
+  mon:
+    driver: bridge
