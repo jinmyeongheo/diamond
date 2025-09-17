@@ -1,6 +1,6 @@
 package jm.diamond.config.scheduler;
 
-import info.seeroo.modnpay.batch.common.BatchHelper;
+import jm.diamond.batch.BatchHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobDetail;

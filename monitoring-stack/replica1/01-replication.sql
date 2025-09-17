@@ -1,0 +1,8 @@
+-- CHANGE REPLICATION SOURCE TO
+--   SOURCE_HOST='mysql-source',
+--   SOURCE_PORT=3306,
+--   SOURCE_USER='repl',
+--   SOURCE_PASSWORD='replpwd',
+--   SOURCE_AUTO_POSITION=1;
+--
+-- START REPLICA;

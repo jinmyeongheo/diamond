@@ -84,7 +84,7 @@ public class SchedulerConfiguration {
 
     SchedulerFactoryBean factory = new SchedulerFactoryBean();
 
-    factory.setSchedulerName("ModnpayBatch");
+    factory.setSchedulerName("diamond-scheduler");
     // Register JobFactory
     factory.setJobFactory(jobFactory);
     // Graceful Shutdown 을 위한 설정으로 Job 이 완료될 때까지 Shutdown 을 대기하는 설정

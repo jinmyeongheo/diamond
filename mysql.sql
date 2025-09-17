@@ -1,4 +1,5 @@
 -- schema-mysql.sql
+-- tables_mysql_innodb.sql
 
 create table order_info (
                             id bigint not null auto_increment,

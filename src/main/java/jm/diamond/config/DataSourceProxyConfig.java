@@ -13,7 +13,7 @@ import java.util.List;
 
 @Slf4j
 @Configuration
-class DsProxyConfig {
+class DataSourceProxyConfig {
 
     // 쿼리는 QueryExecutionListener
     public QueryExecutionListener queryExecutionListener(){
