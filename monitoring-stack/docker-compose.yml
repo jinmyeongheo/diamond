@@ -1,37 +1,37 @@
 services:
-  mysql-source:
+  source:
     image: mysql:8.0
-    container_name: mysql-source
-    ports:
-      - "3307:3306"
+    container_name: source
+    ports: ["3307:3306"]
     environment:
-      MYSQL_ROOT_PASSWORD: rootpwd
+      MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: mall
       MYSQL_ROOT_HOST: "%"
-#    command:
+    command:
+      - --default-authentication-plugin=mysql_native_password
 #      - --character-set-server=utf8mb4
 #      - --collation-server=utf8mb4_unicode_ci
-#      - --default-authentication-plugin=mysql_native_password
     volumes:
       - ./source/conf.d:/etc/mysql/conf.d  # 로컬 ./conf.d 안의 모든 *.cnf를 컨테이너 /etc/mysql/conf.d 로
       - ./source/init:/docker-entrypoint-initdb.d
 
-  mysql-replica1:
+  replica:
     image: mysql:8.0
-    container_name: mysql-replica1
-#    command: [ "mysqld" ]
+    container_name: replica
+    ports: ["3308:3306"]
     environment:
       MYSQL_ROOT_PASSWORD: rootpwd
       TZ: Asia/Seoul
-    ports:
-      - "3308:3306"
-    depends_on: [mysql-source]
+    command:
+      - --default-authentication-plugin=mysql_native_password
+    depends_on: [source]
     volumes:
-      - ./replica1/my.cnf:/etc/mysql/conf.d/my.cnf
-      - ./replica1/01-replication.sql:/docker-entrypoint-initdb.d/01-replication.sql
+      - ./replica1/source.cnf:/etc/mysql/conf.d/source.cnf # 파일복사
+      - ./replica1/01-replication.sql:/docker-entrypoint-initdb.d/01-replication.sql # 파일복사
+    networks: [replnet]
+
 networks:
-  replnet:
-    driver: bridge
+  replnet: {}
 
 
 #  docker compose down -v   # 컨테이너와 볼륨 모두 삭제 (데이터 날아감)
