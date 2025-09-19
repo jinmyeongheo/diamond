@@ -1,4 +1,17 @@
+# master
+-- 바이너리 로그 사용 여부 확인
+SHOW VARIABLES LIKE 'log_bin';
+
+-- 서버의 고유 ID
+SHOW VARIABLES LIKE 'server_id';
+
+-- 현재 바이너리 로그 상태
+SHOW MASTER STATUS;
+
+
 # replica
+
+SHOW REPLICA STATUS;
 
 SHOW VARIABLES LIKE 'gtid_mode';
 
