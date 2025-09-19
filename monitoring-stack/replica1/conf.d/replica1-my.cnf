@@ -1,0 +1,26 @@
+[mysqld]
+# 고유 server-id (소스와 겹치면 안 됨)
+server-id = 2
+
+# 릴레이 로그 권장
+relay_log = relay-bin
+relay_log_recovery = ON
+# log_bin=OFF (기본값이 OFF) 백업/읽기전용 Replica라면 binlog는 굳이 필요 없음(체인 복제 미사용 가정)
+
+# GTID 복제 순서중요
+enforce_gtid_consistency = ON
+gtid_mode = ON
+
+# (선택) 성능/운영 권장
+skip_name_resolve = ON
+binlog_expire_logs_seconds = 604800
+
+
+# 세미싱크(Replica 플러그인)
+# 1) 부팅 시 플러그인 자동 적재
+#plugin_load_add = semisync_replica
+# 2) 플러그인 미적재여도 부팅 실패 방지용 loose 접두 권장
+#loose_rpl_semi_sync_replica_enabled = ON
+
+
+

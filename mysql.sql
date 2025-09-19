@@ -1,3 +1,45 @@
+# replica
+
+SHOW VARIABLES LIKE 'gtid_mode';
+
+STOP REPLICA;
+
+CHANGE REPLICATION SOURCE TO
+    SOURCE_HOST='source',
+    SOURCE_PORT=3306,
+    SOURCE_USER='repl',
+    SOURCE_PASSWORD='replpwd',
+    SOURCE_AUTO_POSITION = 1;
+
+START REPLICA;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 -- schema-mysql.sql
 -- tables_mysql_innodb.sql
 

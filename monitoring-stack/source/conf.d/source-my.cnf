@@ -1,0 +1,20 @@
+[mysqld]
+server-id=1
+log_bin=/var/lib/mysql/mysql-bin
+# binlog_format=ROW 어자피 기본이 row
+
+# GTID 복제 순서중요
+enforce_gtid_consistency=ON
+gtid_mode=ON
+
+# 권장 설정
+binlog_expire_logs_seconds=604800
+skip_name_resolve=ON
+
+# Semi-sync (Source)
+# 1) 부팅 시 플러그인 자동 로드
+#plugin_load_add = semisync_source
+
+# 2) 변수는 loose_ 접두로 (플러그인 미로드여도 부팅 실패 X)
+#loose_rpl_semi_sync_source_enabled = ON
+#loose_rpl_semi_sync_source_timeout = 10000   # 10s 대기(필요 시 조정)
