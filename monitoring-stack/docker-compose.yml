@@ -14,11 +14,12 @@ services:
       - ./source/conf.d:/etc/mysql/conf.d  # 로컬 ./conf.d 안의 모든 *.cnf를 컨테이너 /etc/mysql/conf.d 로
       - ./source/init:/docker-entrypoint-initdb.d
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-proot" ]
+      test: ["CMD-SHELL", "mysql -h localhost -uexporter -pexporterpwd -e 'SELECT 1' >/dev/null 2>&1 || exit 1"]
       interval: 10s
       retries: 5
       start_period: 30s
       timeout: 5s
+    networks: [replnet]
   replica:
     image: mysql:8.4
     container_name: replica
@@ -26,30 +27,56 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
 #    command:
-    depends_on: [source]
+    depends_on:
+      source:
+        condition: service_healthy
     volumes:
       - ./replica1/conf.d:/etc/mysql/conf.d
-#      - ./replica1/01-replication.sql:/docker-entrypoint-initdb.d/01-replication.sql # 파일복사
+      - ./replica1/init:/docker-entrypoint-initdb.d # 파일복사
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-proot" ]
+      test: ["CMD-SHELL", "mysql -h localhost -uexporter -pexporterpwd -e 'SELECT 1' >/dev/null 2>&1 || exit 1"]
       interval: 10s
       retries: 5
       start_period: 30s
       timeout: 5s
     networks: [replnet]
 
-  mysqld-exporter:
+  mysqld-exporter-source:
     image: prom/mysqld-exporter:latest
-    container_name: mysqld-exporter
+    container_name: mysqld-exporter-source
     restart: unless-stopped
-    ports:
-      - "9104:9104"
-    environment:
-      DATA_SOURCE_NAME: "root:root@(source:3306)/"
+    ports: [ "9104:9104" ]
+    command:
+      # ★ 명시적으로 .my.cnf 경로와 대상 DB 주소를 지정 (버전 차이/DSN 함정 회피)
+      - --config.my-cnf=/cfg/.my.cnf
+      - --mysqld.address=source:3306
+    volumes:
+      - ./exporter/source.my.cnf:/cfg/.my.cnf        # [client] user/password 제공
     depends_on:
       source:
         condition: service_healthy
-    networks: [replnet]
+    networks: [ replnet ]
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:9104/metrics" ]
+      interval: 30s
+      retries: 3
+      start_period: 10s
+
+  mysqld-exporter-replica:
+    image: prom/mysqld-exporter:latest
+    container_name: mysqld-exporter-replica
+    restart: unless-stopped
+    ports: ["9105:9104"]   # 호스트 포트 겹침 방지
+    command:
+      - --config.my-cnf=/cfg/.my.cnf
+      - --mysqld.address=replica:3306
+    environment: {}
+    volumes:
+      - ./exporter/replica.my.cnf:/cfg/.my.cnf:ro
+    depends_on:
+      replica:
+        condition: service_healthy
+    networks: [ replnet ]
     healthcheck:
       test: [ "CMD", "wget", "-qO-", "http://localhost:9104/metrics" ]
       interval: 30s
@@ -66,7 +93,9 @@ services:
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     depends_on:
-      mysqld-exporter:
+      mysqld-exporter-source:
+        condition: service_healthy
+      mysqld-exporter-replica:
         condition: service_healthy
     healthcheck:
       test: [ "CMD", "wget", "-qO-", "http://localhost:9090/-/ready" ]
