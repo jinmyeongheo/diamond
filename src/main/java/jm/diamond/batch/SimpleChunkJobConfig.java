@@ -17,6 +17,8 @@ import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilde
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.quartz.CronTriggerFactoryBean;
+import org.springframework.scheduling.quartz.JobDetailFactoryBean;
 
 import javax.persistence.EntityManagerFactory;
 
@@ -26,10 +28,23 @@ import javax.persistence.EntityManagerFactory;
 @RequiredArgsConstructor
 public class SimpleChunkJobConfig {
 
+    private static final String JOB_NAME = "ALNRTP001";
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
     private final EntityManagerFactory emf;
 
+    @Bean(name = "_trigger")
+    public CronTriggerFactoryBean jobTrigger() {
+        return BatchHelper.cronTriggerFactoryBeanBuilder()
+                .cronExpression("0 30 0 1/1 * ? *") // 매일 0시 30분
+                .jobDetailFactoryBean(jobDetail())
+                .build();
+    }
+
+    @Bean(name = JOB_NAME + "_detail")
+    public JobDetailFactoryBean jobDetail() {
+        return BatchHelper.jobDetailFactoryBeanBuilder().job(simpleChunkJob()).build();
+    }
 
     @Bean
     public Job simpleChunkJob(Step simpleChunkStep) {
