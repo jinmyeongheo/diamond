@@ -1,4 +1,4 @@
-package jm.diamond.config.scheduler.config;
+package jm.diamond.config;
 /*
  * Created By Kingbbode
  * blog : http://kingbbode.github.io

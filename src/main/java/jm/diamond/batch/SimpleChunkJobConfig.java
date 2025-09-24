@@ -33,29 +33,41 @@ public class SimpleChunkJobConfig {
     private final StepBuilderFactory stepBuilderFactory;
     private final EntityManagerFactory emf;
 
-    @Bean(name = "_trigger")
-    public CronTriggerFactoryBean jobTrigger() {
-        return BatchHelper.cronTriggerFactoryBeanBuilder()
-                .cronExpression("0 30 0 1/1 * ? *") // 매일 0시 30분
-                .jobDetailFactoryBean(jobDetail())
-                .build();
-    }
+    private final LocalDateParameter localDateParameter;
 
-    @Bean(name = JOB_NAME + "_detail")
-    public JobDetailFactoryBean jobDetail() {
-        return BatchHelper.jobDetailFactoryBeanBuilder().job(simpleChunkJob()).build();
+    @Bean
+    @JobScope
+    public LocalDateParameter localDateParameter(
+            @Value("#{jobParameters[requestDate]}") String requestDate) {
+        return new LocalDateParameter(requestDate);
     }
 
     @Bean
-    public Job simpleChunkJob(Step simpleChunkStep) {
+    public CronTriggerFactoryBean exampleJob1Trigger() {
+        return BatchHelper.cronTriggerFactoryBeanBuilder()
+                .cronExpression("0 0/1 * 1/1 * ? *")
+                .jobDetailFactoryBean(exampleJob1Schedule())
+                .build();
+    }
+
+    @Bean
+    public JobDetailFactoryBean exampleJob1Schedule() {
+        return BatchHelper.jobDetailFactoryBeanBuilder()
+                .job(simpleChunkJob())
+                .build();
+    }
+
+    @Bean
+    public Job simpleChunkJob() {
         return jobBuilderFactory.get("simpleChunkJob")
-                .start(simpleChunkStep)
+                .start(simpleChunkStep())
                 .build();
     }
 
     @Bean
     @JobScope // Late Binding -> thread safe
-    public Step simpleChunkStep(@Value("#{jobParameters['power']}") String param) {
+    public Step simpleChunkStep() {
+        log.info("localDateParameter : {}", localDateParameter);
         return stepBuilderFactory.get("simpleChunkStep")
                 .<OrderInfo, PaymentBaseInfo>chunk(3) // 3개 단위로 처리
                 .reader(itemReader())
