@@ -4,24 +4,49 @@ import jm.diamond.dao.entity.OrderInfo;
 import jm.diamond.dao.entity.PaymentBaseInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder;
+import org.springframework.batch.item.file.FlatFileParseException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.json.JsonParseException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.dao.DeadlockLoserDataAccessException;
+import org.springframework.retry.RetryCallback;
+import org.springframework.retry.RetryContext;
+import org.springframework.retry.RetryListener;
+import org.springframework.retry.RetryPolicy;
+import org.springframework.retry.backoff.BackOffPolicy;
+import org.springframework.retry.backoff.ExponentialBackOffPolicy;
+import org.springframework.retry.listener.RetryListenerSupport;
+import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.scheduling.quartz.CronTriggerFactoryBean;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 
 import javax.persistence.EntityManagerFactory;
+import java.net.SocketTimeoutException;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
+/**
+ *
+ * https://jonny-cho.github.io/spring/2025-07-27-spring-batch-chapter5-skip-retry-restart/
+ * https://www.javacodegeeks.com/2025/02/robust-error-handling-in-spring-batch.html?utm_source=chatgpt.com
+ * 파티션으로 나눈 구역을 개별 스레드에 할당해서 병렬처리
+ * */
 
 @Slf4j
 @Configuration
@@ -69,13 +94,59 @@ public class SimpleChunkJobConfig {
     public Step simpleChunkStep() {
         log.info("localDateParameter : {}", localDateParameter);
         return stepBuilderFactory.get("simpleChunkStep")
+                .startLimit(3)	//	재시작 3번 가능
                 .<OrderInfo, PaymentBaseInfo>chunk(3) // 3개 단위로 처리
                 .reader(itemReader())
                 .processor(itemProcessor())
                 .writer(itemWriter())
+                .faultTolerant()
+                .retryPolicy(transientOnlyPolicy())  // ✅ Retry: 일시적 오류만
+                .backOffPolicy(exponentialBackoff()) // ✅ Backoff: 과도한 재시도 방지
+                .skipPolicy(new MapBasedSkipPolicy()) // ❌ 데이터 오류는 retry 금지 → 필요 시 skip으로 전환
+                .skipLimit(100)
+                .listener(retryListener())   // 로깅/메트릭
+                .noSkip(NullPointerException.class) //  NullPointerException 에 대해서는 skip 하지 않음
 //                .transactionManager(new ResourcelessTransactionManager())
                 .build();
     }
+
+
+
+    @Bean
+    public RetryPolicy transientOnlyPolicy() {
+        Map<Class<? extends Throwable>, Boolean> map = new HashMap<>();
+        map.put(HttpServerErrorException.class, true);
+        map.put(SocketTimeoutException.class, true);
+        map.put(DeadlockLoserDataAccessException.class, true);
+
+        // 명시적으로 재시도 금지(데이터/비즈니스 오류)
+        map.put(HttpClientErrorException.class, false);          // 4xx
+        map.put(ConstraintViolationException.class, false);
+        map.put(JsonParseException.class, false);
+        map.put(IllegalArgumentException.class, false);
+
+        return new SimpleRetryPolicy(3, map, true); // true=Subclass 매칭 허용
+    }
+
+    @Bean
+    public BackOffPolicy exponentialBackoff() {
+        ExponentialBackOffPolicy p = new ExponentialBackOffPolicy();
+        p.setInitialInterval(500);    // 0.5s
+        p.setMultiplier(2.0);         // 0.5s → 1s → 2s
+        p.setMaxInterval(5000);       // 5s caps
+        return p;
+    }
+
+    @Bean
+    public RetryListener retryListener() {
+        return new RetryListenerSupport() {
+            @Override
+            public <T, E extends Throwable> void onError(RetryContext ctx, RetryCallback<T, E> cb, Throwable t) {
+                log.warn("retrying {}th for {} due to {}", ctx.getRetryCount(), ctx.getAttribute("context.name"), t.toString());
+            }
+        };
+    }
+
 
 //    @Bean
 //    @StepScope
@@ -104,6 +175,7 @@ public class SimpleChunkJobConfig {
                 .queryString("SELECT o FROM OrderInfo AS o")
                 .pageSize(CHUNK_SIZE)
                 .entityManagerFactory(emf)
+                .saveState(true) // ✅ ExecutionContext에 진행상태 저장
                 .build();
     }
 
