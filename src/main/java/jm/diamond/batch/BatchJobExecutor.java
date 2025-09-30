@@ -44,7 +44,7 @@ public class BatchJobExecutor implements Job {
             //afterExecute(context);
             //scheduleNextJob(context);
         } catch (NoSuchJobException | JobExecutionAlreadyRunningException | JobRestartException | JobInstanceAlreadyCompleteException | JobParametersInvalidException | SchedulerException e) {
-            log.error("job execution exception! - {}", e.getCause());
+            log.error("job execution exception! - {}", e);
             throw new JobExecutionException();
         }
     }

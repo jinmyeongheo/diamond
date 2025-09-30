@@ -1,5 +1,11 @@
 package jm.diamond.batch;
 
+import jm.diamond.batch.reader.modn.reader.QuerydslNoOffsetPagingItemReader;
+import jm.diamond.batch.reader.modn.reader.QuerydslPagingItemReader;
+import jm.diamond.batch.reader.modn.reader.QuerydslZeroPagingItemReader;
+import jm.diamond.batch.reader.modn.reader.expression.Expression;
+import jm.diamond.batch.reader.modn.reader.options.QuerydslNoOffsetNumberOptions;
+import jm.diamond.batch.reader.modn.reader.options.QuerydslNoOffsetOptions;
 import jm.diamond.dao.entity.OrderInfo;
 import jm.diamond.dao.entity.PaymentBaseInfo;
 import lombok.RequiredArgsConstructor;
@@ -38,8 +44,11 @@ import org.springframework.web.client.HttpServerErrorException;
 import javax.persistence.EntityManagerFactory;
 import java.net.SocketTimeoutException;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+
+import static jm.diamond.dao.entity.QOrderInfo.orderInfo;
 
 /**
  *
@@ -53,12 +62,13 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class SimpleChunkJobConfig {
 
-    private static final String JOB_NAME = "ALNRTP001";
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
     private final EntityManagerFactory emf;
 
     private final LocalDateParameter localDateParameter;
+
+    int CHUNK_SIZE = 600;
 
     @Bean
     @JobScope
@@ -82,7 +92,7 @@ public class SimpleChunkJobConfig {
                 .build();
     }
 
-    @Bean
+    @Bean(name = "simpleChunkJob")
     public Job simpleChunkJob() {
         return jobBuilderFactory.get("simpleChunkJob")
                 .start(simpleChunkStep())
@@ -95,7 +105,7 @@ public class SimpleChunkJobConfig {
         log.info("localDateParameter : {}", localDateParameter);
         return stepBuilderFactory.get("simpleChunkStep")
                 .startLimit(3)	//	재시작 3번 가능
-                .<OrderInfo, PaymentBaseInfo>chunk(3) // 3개 단위로 처리
+                .<OrderInfo, PaymentBaseInfo>chunk(CHUNK_SIZE) // 3개 단위로 처리
                 .reader(itemReader())
                 .processor(itemProcessor())
                 .writer(itemWriter())
@@ -167,21 +177,25 @@ public class SimpleChunkJobConfig {
 
     @Bean
     @StepScope
-    public JpaPagingItemReader<OrderInfo> itemReader(){
-        int CHUNK_SIZE = 100;
+    public QuerydslPagingItemReader<OrderInfo> itemReader(){
 
-        return new JpaPagingItemReaderBuilder<OrderInfo>()
-                .name("customerJpaPagingItemReader")
-                .queryString("SELECT o FROM OrderInfo AS o")
-                .pageSize(CHUNK_SIZE)
-                .entityManagerFactory(emf)
-                .saveState(true) // ✅ ExecutionContext에 진행상태 저장
-                .build();
+        QuerydslNoOffsetNumberOptions<OrderInfo, Long> option = new QuerydslNoOffsetNumberOptions<>(orderInfo.id, Expression.ASC);
+        QuerydslNoOffsetPagingItemReader<OrderInfo> orderInfoQuerydslNoOffsetPagingItemReader =
+                new QuerydslNoOffsetPagingItemReader<>(emf, CHUNK_SIZE, option, jpaQueryFactory -> jpaQueryFactory
+                .selectFrom(orderInfo)
+                .where(orderInfo.orderDateTime
+                        .between(LocalDateTime.of(2025, 9, 30, 22, 30, 0),
+                                LocalDateTime.of(2025, 10, 30, 22, 30, 0)))
+        );
+
+        orderInfoQuerydslNoOffsetPagingItemReader.setSaveState(true); // ✅ ExecutionContext에 진행상태 저장
+
+        return orderInfoQuerydslNoOffsetPagingItemReader;
     }
 
     @Bean
     public ItemProcessor<OrderInfo, PaymentBaseInfo> itemProcessor() {
-        return item -> new PaymentBaseInfo(item.getId(), item.getAmount()); // 간단히 대문자로 변환
+        return item -> new PaymentBaseInfo(item.getId(), item.getAmount(),LocalDateTime.now()); // 간단히 대문자로 변환
     }
 
     @Bean

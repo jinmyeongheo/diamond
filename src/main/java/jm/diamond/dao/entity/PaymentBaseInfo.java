@@ -22,4 +22,6 @@ public class PaymentBaseInfo {
     private Long id;
 
     private BigDecimal amount;
+
+    private LocalDateTime regDateTime;
 }

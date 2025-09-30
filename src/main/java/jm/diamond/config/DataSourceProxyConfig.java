@@ -1,12 +1,7 @@
 package jm.diamond.config;
 
 import lombok.extern.slf4j.Slf4j;
-import net.ttddyy.dsproxy.ExecutionInfo;
-import net.ttddyy.dsproxy.QueryInfo;
-import net.ttddyy.dsproxy.listener.MethodExecutionListener;
-import net.ttddyy.dsproxy.listener.QueryExecutionListener;
-import net.ttddyy.dsproxy.listener.TracingMethodListener;
-import org.springframework.context.annotation.Bean;
+
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
@@ -15,26 +10,26 @@ import java.util.List;
 @Configuration
 class DataSourceProxyConfig {
 
-    // 쿼리는 QueryExecutionListener
-    public QueryExecutionListener queryExecutionListener(){
-        return new QueryExecutionListener() {
-            @Override
-            public void beforeQuery(ExecutionInfo executionInfo, List<QueryInfo> list) {
-
-            }
-
-            @Override
-            public void afterQuery(ExecutionInfo executionInfo, List<QueryInfo> list) {
-
-            }
-        };
-    }
-
-    @Bean
-    public MethodExecutionListener jdbcTracing() {
-        // 모든 JDBC 메서드 호출을 로깅
-        return new TracingMethodListener();
-    }
+//    // 쿼리는 QueryExecutionListener
+//    public QueryExecutionListener queryExecutionListener(){
+//        return new QueryExecutionListener() {
+//            @Override
+//            public void beforeQuery(ExecutionInfo executionInfo, List<QueryInfo> list) {
+//
+//            }
+//
+//            @Override
+//            public void afterQuery(ExecutionInfo executionInfo, List<QueryInfo> list) {
+//
+//            }
+//        };
+//    }
+//
+//    @Bean
+//    public MethodExecutionListener jdbcTracing() {
+//        // 모든 JDBC 메서드 호출을 로깅
+//        return new TracingMethodListener();
+//    }
 
     // 설정 호출 자체는 MethodExecutionListener
 //    @Bean
