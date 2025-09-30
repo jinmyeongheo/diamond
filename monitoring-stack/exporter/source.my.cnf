@@ -1,3 +1,0 @@
-[client]
-user=exporter          ; exporter 계정 (소스에서 생성됨)
-password=exporterpwd   ; exporter 계정 비밀번호
