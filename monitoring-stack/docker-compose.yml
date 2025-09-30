@@ -50,6 +50,9 @@ services:
       # ★ 명시적으로 .my.cnf 경로와 대상 DB 주소를 지정 (버전 차이/DSN 함정 회피)
       - --config.my-cnf=/cfg/.my.cnf
       - --mysqld.address=source:3306
+      - --collect.info_schema.innodb_metrics
+      - --collect.engine_innodb_status              # InnoDB 상태 파싱(락/데드락 통계 보강)
+      - --collect.info_schema.processlist   # 활성 스레드/상태 카운팅용
     volumes:
       - ./exporter/source.my.cnf:/cfg/.my.cnf        # [client] user/password 제공
     depends_on:
@@ -70,6 +73,9 @@ services:
     command:
       - --config.my-cnf=/cfg/.my.cnf
       - --mysqld.address=replica:3306
+      - --collect.info_schema.innodb_metrics        # row lock waits/time 등
+      - --collect.engine_innodb_status              # InnoDB 상태 파싱(락/데드락 통계 보강)
+      - --collect.info_schema.processlist   # 활성 스레드/상태 카운팅용
     environment: {}
     volumes:
       - ./exporter/replica.my.cnf:/cfg/.my.cnf:ro
@@ -130,3 +136,8 @@ networks:
 
 #  docker compose down -v   # 컨테이너와 볼륨 모두 삭제 (데이터 날아감)
 #  docker compose up -d     # 다시 올리면 환경변수 적용된 상태로 DB 초기화
+
+
+# Exporter: MySQL 상태를 “Prometheus가 이해할 수 있는 지표 포맷”으로 변환.
+# Prometheus: 주기적으로 scrape → 내부 DB에 시계열 저장.
+# Grafana: Prometheus DB에 쿼리 → 시각화.
