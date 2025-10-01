@@ -16,7 +16,9 @@ import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.JpaItemWriter;
+import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.json.JsonParseException;
 import org.springframework.context.annotation.Bean;
@@ -36,6 +38,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 
 import javax.persistence.EntityManagerFactory;
+import javax.sql.DataSource;
 import java.net.SocketTimeoutException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -58,6 +61,7 @@ public class SimpleChunkJobConfig {
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
     private final EntityManagerFactory emf;
+    private final DataSource dataSource;
 
     private final LocalDateParameter localDateParameter;
 
@@ -101,7 +105,7 @@ public class SimpleChunkJobConfig {
                 .<OrderInfo, PaymentBaseInfo>chunk(CHUNK_SIZE) // 3개 단위로 처리
                 .reader(itemReader())
                 .processor(itemProcessor())
-                .writer(itemWriter())
+                .writer(orderInfoWriter())
                 .faultTolerant()
                 .retryPolicy(transientOnlyPolicy())  // ✅ Retry: 일시적 오류만
                 .backOffPolicy(exponentialBackoff()) // ✅ Backoff: 과도한 재시도 방지
@@ -193,15 +197,28 @@ public class SimpleChunkJobConfig {
 
     @Bean
     public ItemProcessor<OrderInfo, PaymentBaseInfo> itemProcessor() {
-        return item -> new PaymentBaseInfo(item.getId(), item.getAmount(),LocalDateTime.now()); // 간단히 대문자로 변환
+        return item -> PaymentBaseInfo.builder().amount(item.getAmount()).regDateTime(LocalDateTime.now()).build(); // 간단히 대문자로 변환
     }
 
+//    @Bean
+//    @StepScope
+//    public JpaItemWriter<PaymentBaseInfo> itemWriter() {
+//        JpaItemWriter<PaymentBaseInfo> writer = new JpaItemWriter<>();
+//        writer.setEntityManagerFactory(emf);
+//        return writer;
+//    }
+
+
+    // rewriteBatchedStatements=true 설정 비교
     @Bean
     @StepScope
-    public JpaItemWriter<PaymentBaseInfo> itemWriter() {
-        JpaItemWriter<PaymentBaseInfo> writer = new JpaItemWriter<>();
-        writer.setEntityManagerFactory(emf);
-        return writer;
+    public JdbcBatchItemWriter<PaymentBaseInfo> orderInfoWriter() {
+        return new JdbcBatchItemWriterBuilder<PaymentBaseInfo>()
+                .dataSource(dataSource)
+                .sql("INSERT INTO payment_base_info (amount, reg_date_time) " +
+                        "VALUES (:amount, :regDateTime)")
+                .beanMapped() // OrderInfo 객체의 프로퍼티명 -> SQL 파라미터 매핑
+                .build();
     }
 }
 
