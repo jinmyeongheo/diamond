@@ -18,8 +18,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @ActiveProfiles("local")
 class SampleTest {
 
-
-
     @Autowired
     private ApplicationContext applicationContext;
 

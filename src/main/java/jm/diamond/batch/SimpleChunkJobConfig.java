@@ -2,10 +2,8 @@ package jm.diamond.batch;
 
 import jm.diamond.batch.reader.modn.reader.QuerydslNoOffsetPagingItemReader;
 import jm.diamond.batch.reader.modn.reader.QuerydslPagingItemReader;
-import jm.diamond.batch.reader.modn.reader.QuerydslZeroPagingItemReader;
 import jm.diamond.batch.reader.modn.reader.expression.Expression;
 import jm.diamond.batch.reader.modn.reader.options.QuerydslNoOffsetNumberOptions;
-import jm.diamond.batch.reader.modn.reader.options.QuerydslNoOffsetOptions;
 import jm.diamond.dao.entity.OrderInfo;
 import jm.diamond.dao.entity.PaymentBaseInfo;
 import lombok.RequiredArgsConstructor;
@@ -17,12 +15,8 @@ import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
-import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.database.JpaItemWriter;
-import org.springframework.batch.item.database.JpaPagingItemReader;
-import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder;
-import org.springframework.batch.item.file.FlatFileParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.json.JsonParseException;
 import org.springframework.context.annotation.Bean;
@@ -43,7 +37,6 @@ import org.springframework.web.client.HttpServerErrorException;
 
 import javax.persistence.EntityManagerFactory;
 import java.net.SocketTimeoutException;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -179,9 +172,14 @@ public class SimpleChunkJobConfig {
     @StepScope
     public QuerydslPagingItemReader<OrderInfo> itemReader(){
 
-        QuerydslNoOffsetNumberOptions<OrderInfo, Long> option = new QuerydslNoOffsetNumberOptions<>(orderInfo.id, Expression.ASC);
+        QuerydslNoOffsetNumberOptions<OrderInfo, Long> option =
+                new QuerydslNoOffsetNumberOptions<>(orderInfo.id, Expression.ASC);
         QuerydslNoOffsetPagingItemReader<OrderInfo> orderInfoQuerydslNoOffsetPagingItemReader =
-                new QuerydslNoOffsetPagingItemReader<>(emf, CHUNK_SIZE, option, jpaQueryFactory -> jpaQueryFactory
+                new QuerydslNoOffsetPagingItemReader<>(
+                        emf,
+                        CHUNK_SIZE,
+                        option,
+                        f -> f
                 .selectFrom(orderInfo)
                 .where(orderInfo.orderDateTime
                         .between(LocalDateTime.of(2025, 9, 30, 22, 30, 0),
