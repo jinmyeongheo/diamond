@@ -208,25 +208,11 @@ CREATE TABLE Settlement (
 );
 
 
-* 정산 배치 고도화 2022.05 - 2024.11
-(java, spring boot batch, jpa, queryDsl, quartz, mariaDB)
-- 성능 검증을 위한 배치 테스트환경 구축하고 이를 통해 고도화에 활용할 수 있는 객관적 수치 시각화
-- 수치를 바탕으로 chunk size 및 hikari connection pool 최적화
-- quartz 클러스터링 + db 이중화.
-- DB조회 및 쓰기 작업 시 불필요하게 발생하는 transaction과 쿼리를 제거해 성능 개선
-- 비효율적인 쿼리를 튜닝하고 불필요한 인덱스 테이블 제거
+결제 데이터 → 정산 상세정보 생성
+취소 데이터 → 정산 상세정보 생성
+상세정보 집계 → 가맹점 단위 일별 정산 생성
+상세정보 집계 → 금융사·채널 단위 정산 상세 생성
 
-* QR결제 관리자 시스템 2022.04 - 2024.11
-(java, keycloak, spring boot, spring security, thymleaf, jpa, mybatis, mariaDB)
-- keycloak을 이용한 sso 구현 및 세션 방식 개선.
-- 가맹점 승인 처리시 동기 I/O들로 인한 지연 및 실패를 비동기 처리와 Outbox 패턴으로 개선하고, 낙관적 락으로 중복 승인 동시성 문제 해결
-- 복잡한 가맹점 등록 로직을 전략 패턴 적용과 불변 DTO 적용으로 서비스와 검증 로직을 분리해 사이드 이팩트 감소 및 코드 생산성 개선
-- Excel 다운로드 시 OOM문제를 스트리밍 처리 및 힙 덤프 분석으로 불필요한 객체 생성 제거로 해결
-- Entity 연관관계별 전략(1:1 Fetch Join, 1:N 선택적 LAZY) 적용으로 N+1 문제 해결
-
-* 서울페이+ 고도화 2022.01 - 2022.04
-- 데브온 프레임워크환경에서 상품권 조회, 공지사항, 팝업 페이지 개발
-
-* 농협 올원공구 프론트 신규개발 및 유지보수 2021.04 - 2022.01
-- 올원뱅크앱에서 웹뷰로 제공하는 공동구매 서비스
-- vue2를 이용한 spa 프론트개발
+Reader: 전일자 거래 승인 데이터(MultiOrderApproval) 조회
+Processor: 거래 승인 데이터 → 정산 기초 데이터(PaymentBaseInfo)로 변환
+Writer: 변환된 정산 기초 데이터를 DB에 저장
