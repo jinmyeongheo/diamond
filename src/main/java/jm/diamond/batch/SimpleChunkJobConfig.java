@@ -65,7 +65,7 @@ public class SimpleChunkJobConfig {
 
     private final LocalDateParameter localDateParameter;
 
-    int CHUNK_SIZE = 600;
+    int CHUNK_SIZE = 1000;
 
     @Bean
     @JobScope
@@ -186,8 +186,8 @@ public class SimpleChunkJobConfig {
                         f -> f
                 .selectFrom(orderInfo)
                 .where(orderInfo.orderDateTime
-                        .between(LocalDateTime.of(2025, 9, 30, 22, 30, 0),
-                                LocalDateTime.of(2025, 10, 30, 22, 30, 0)))
+                        .between(LocalDateTime.of(2021, 9, 30, 22, 30, 0),
+                                LocalDateTime.of(2026, 10, 30, 22, 30, 0)))
         );
 
         orderInfoQuerydslNoOffsetPagingItemReader.setSaveState(true); // ✅ ExecutionContext에 진행상태 저장
