@@ -33,10 +33,10 @@ import java.util.Properties;
 
 @Configuration
 @EnableBatchProcessing
-public class SchedulerConfiguration {
+public class QuartzConfiguration {
   private final QuartzProperties quartzProperties;
 
-  public SchedulerConfiguration(QuartzProperties quartzProperties) {
+  public QuartzConfiguration(QuartzProperties quartzProperties) {
     this.quartzProperties = quartzProperties;
   }
 

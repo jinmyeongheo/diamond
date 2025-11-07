@@ -39,7 +39,9 @@ public class BatchJobExecutor implements Job {
             String jobName = BatchHelper.getJobName(context.getMergedJobDataMap());
             log.info("[{}] started.", jobName);
             JobParameters jobParameters = BatchHelper.getJobParameters(context);
-            jobLauncher.run(jobLocator.getJob(jobName), jobParameters);
+            if (jobParameters == null) {
+                jobLauncher.run(jobLocator.getJob(jobName), jobParameters);
+            }
             log.info("[{}] completed.", jobName);
             //afterExecute(context);
             //scheduleNextJob(context);
