@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +44,6 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
        throws ServletException, IOException {
 
       try {
-
          ContentCachingResponseWrapper contentCachingResponseWrapper = new ContentCachingResponseWrapper(
              httpServletResponse);
 

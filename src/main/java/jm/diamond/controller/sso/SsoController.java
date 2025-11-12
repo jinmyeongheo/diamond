@@ -25,7 +25,7 @@ public class SsoController {
     @GetMapping("/sso")
     public RedirectView sso() {
         // Keycloak Authorization Endpoint
-        String authorizationEndpoint = "http://localhost:8080/realms/nawabari/protocol/openid-connect/auth";
+        String authorizationEndpoint = "http://localhost:8081/realms/nawabari/protocol/openid-connect/auth";
 
         // state / nonce 값은 반드시 무작위 생성 (CSRF / Replay 방어용)
         String state = UUID.randomUUID().toString();
@@ -56,11 +56,15 @@ public class SsoController {
             @RequestParam(required = false) String error_description
     ) {
 
-        log.debug("code :: {}", code);
-        log.debug("state :: {}", state);
-        log.debug("session_state :: {}", session_state);
-        log.debug("error :: {}", error);
-        log.debug("error_description :: {}", error_description);
+        String authorizationEndpoint = "http://localhost:8081/realms/nawabari/protocol/openid-connect/auth";
+
+        log.info("code :: {}", code);
+        log.info("state :: {}", state);
+        log.info("session_state :: {}", session_state);
+        log.info("error :: {}", error);
+        log.info("error_description :: {}", error_description);
+
+
 
         return new ResponseEntity<>(code, HttpStatus.OK);
     }

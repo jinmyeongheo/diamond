@@ -8,6 +8,7 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import org.apache.commons.io.IOUtils;
+import org.springframework.util.StreamUtils;
 
 public class CustomHttpServletRequestWrapper extends HttpServletRequestWrapper {
 

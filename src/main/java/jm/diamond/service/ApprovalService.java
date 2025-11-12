@@ -13,6 +13,7 @@ public class ApprovalService {
 
     public void approve() {
         int imageCnt = 4;
+
         for (int i = 0; i < imageCnt; i++) {
             imageService.uploadImage();
         }
