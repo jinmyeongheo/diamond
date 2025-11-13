@@ -29,8 +29,8 @@ public class User {
 
    private String pw;
 
-   @OneToMany(mappedBy = "seq")
-   private List<PrivilegeInfo> privilegeInfos;
+   @OneToMany(mappedBy = "user")
+   private List<UserPrivilege> privilegeInfos;
 
    public void encryptPassword(String encryptPassword){
       this.pw = encryptPassword;

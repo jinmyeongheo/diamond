@@ -4,6 +4,7 @@ import jm.diamond.controller.sso.LoginUser;
 import jm.diamond.controller.sso.WrappedOidcUser;
 import jm.diamond.dao.entity.PrivilegeInfo;
 import jm.diamond.dao.entity.User;
+import jm.diamond.dao.entity.UserPrivilege;
 import jm.diamond.dao.repository.UserRepository;
 import jm.diamond.security.CustomAuthenticationFailureHandler;
 import jm.diamond.security.CustomAuthenticationProvider;
@@ -38,6 +39,7 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 
 import javax.servlet.http.HttpSession;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -95,12 +97,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         .defaultSuccessUrl("/home"))
 
                 .logout(logout -> logout
-                        .logoutSuccessHandler((request, response, authentication) -> {
-                            log.info("==== [LOGOUT SUCCESS] ====");
-                            response.sendRedirect("/login");
-                        })
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login")
                         .invalidateHttpSession(true)
                         .clearAuthentication(true)
                         .logoutSuccessHandler(oidcLogoutSuccessHandler()))
@@ -121,13 +118,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     // Back-Channel Logout 로그아웃 구현 필요.
 
-    private LogoutSuccessHandler oidcLogoutSuccessHandler() {
+    @Bean
+    public LogoutSuccessHandler oidcLogoutSuccessHandler() {
         OidcClientInitiatedLogoutSuccessHandler oidcLogoutSuccessHandler =
                 new OidcClientInitiatedLogoutSuccessHandler(this.clientRegistrationRepository);
 
         // Sets the `URI` that the End-User's User Agent will be redirected to
         // after the logout has been performed at the Provider
-        oidcLogoutSuccessHandler.setPostLogoutRedirectUri(URI.create("https://localhost:8080"));
+        oidcLogoutSuccessHandler.setPostLogoutRedirectUri(URI.create("http://localhost:8888/logout/success"));
 
         return oidcLogoutSuccessHandler;
     }
@@ -135,11 +133,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private OAuth2UserService<OidcUserRequest, OidcUser> oidcUserService() {
         // UserInfo 요청 전 처리(pre-processing)나 UserInfo 응답 후 처리(post-handling)를 커스터마이징
-        log.info("호출!!!!");
+
         final OidcUserService delegate = new OidcUserService();
 
         return (userRequest) -> {
-
+            log.info("호출!!!!");
             // 기본 구현체(delegate)에 사용자 로딩을 위임
             OidcUser oidcUser = delegate.loadUser(userRequest);
 
@@ -151,28 +149,25 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
             User userInfo = userRepository.findByEmail(oidcUser.getEmail()).orElseThrow(() -> new RuntimeException("회원등록해라잇"));
-            List<PrivilegeInfo> privilegeInfos = userInfo.getPrivilegeInfos();
+//            List<PrivilegeInfo> privilegeInfos = userInfo.getPrivilegeInfos();
 
-            Set<GrantedAuthority> authoritySet= privilegeInfos.stream()
-                    .map(p -> new SimpleGrantedAuthority(p.getName()))
-                    .collect(Collectors.toSet());
 
-            List<String> authorityList = privilegeInfos.stream()
-                    .map(p -> p.getName())
-                    .collect(Collectors.toList());
+            Set<SimpleGrantedAuthority> authoritySet = new HashSet<>();
+            authoritySet.add(new SimpleGrantedAuthority("READ"));
+            authoritySet.add(new SimpleGrantedAuthority("WRITE"));
+
+            List<String> authorityList = Arrays.asList("READ", "WRITE");
 
             // 3) 기존 oidcUser 를 복사하되, authorities 만 mappedAuthorities 로 교체한 새 객체 생성
-            oidcUser = new DefaultOidcUser(
+            DefaultOidcUser defaultOidcUser = new DefaultOidcUser(
                     authoritySet,
                     oidcUser.getIdToken(),
                     oidcUser.getUserInfo()
             );
 
-            LoginUser loginUser = new LoginUser(userInfo.getName(), authorityList);
+            LoginUser loginUser = new LoginUser(userInfo.getName(), authorityList, userInfo.getPw());
 
-            new WrappedOidcUser()
-
-            return oidcUser;
+            return new WrappedOidcUser(defaultOidcUser, loginUser);
         };
     }
 

@@ -13,6 +13,7 @@ public class LoginUser implements UserDetails {
 
     private final String name;
     private final List<String> authorities;
+    private final String password;
 
     @Override
     public boolean isEnabled() {
@@ -36,12 +37,12 @@ public class LoginUser implements UserDetails {
 
     @Override
     public String getUsername() {
-        return "";
+        return this.name;
     }
 
     @Override
     public String getPassword() {
-        return "";
+        return this.password;
     }
 
     @Override

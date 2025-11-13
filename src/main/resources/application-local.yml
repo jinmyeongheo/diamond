@@ -13,20 +13,20 @@ spring:
           diamond: # 클라이언트 id CommonOAuth2Provider는 잘알려진 client속성 미리 정의해둔거
             provider: nawabari
             client-id: diamond
-            client-secret: ENNIXRmN5QegDhdal1mLxUc41WGFGeoP
+            client-secret: frJg59COB69s6wg2ENhMHTOCeyd5SK6R
             scope: openid, profile, email # OpenID Connect 1.0을 사용하겠다. OIDC 전용 컴포넌트(예: OidcReactiveOAuth2UserService)를 사용
             authorization-grant-type: authorization_code
             redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
         provider:
           nawabari:
-            authorization-uri: http://localhost:8080/realms/nawabari/protocol/openid-connect/auth
-            token-uri: http://localhost:8080/realms/nawabari/protocol/openid-connect/token
-            user-info-uri: http://localhost:8080/realms/nawabari/protocol/openid-connect/userinfo
-            user-info-authentication-method: header
-            user-name-attribute: preferred_username
-            jwk-set-uri: http://localhost:8080/realms/nawabari/protocol/openid-connect/certs
+#            authorization-uri: http://localhost:8080/realms/nawabari/protocol/openid-connect/auth
+#            token-uri: http://localhost:8080/realms/nawabari/protocol/openid-connect/token
+#            user-info-uri: http://localhost:8080/realms/nawabari/protocol/openid-connect/userinfo
+#            user-info-authentication-method: header
+#            user-name-attribute: preferred_username
+#            jwk-set-uri: http://localhost:8080/realms/nawabari/protocol/openid-connect/certs
             # ⚠️ issuer-uri는 절대 넣지 말 것 (넣는 순간 Keycloak metadata 파싱 → mtls 오류 재발)
-            # issuer-uri: http://localhost:8080/realms/nawabari   # ❌ 주석 유지
+             issuer-uri: http://localhost:8080/realms/nawabari   # ❌ 주석 유지
 
   datasource:
     url: jdbc:mysql://127.0.0.1:3307/mall?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Seoul

@@ -26,4 +26,13 @@ public class SsoController {
         return "main";
     }
 
+    @GetMapping("/logout/success")
+    public String logoutSuccess() {
+        return "logout-success"; // Thymeleaf 페이지 등
+    }
+
+    @GetMapping("/temp")
+    public String temp() {
+        return "temp"; // Thymeleaf 페이지 등
+    }
 }
