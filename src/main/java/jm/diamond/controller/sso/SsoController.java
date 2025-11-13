@@ -18,67 +18,12 @@ public class SsoController {
 
     @GetMapping("/login")
     public String login() {
-
-        return "login.html";
-    }
-
-    @GetMapping("/sso")
-    public RedirectView sso() {
-        // Keycloak Authorization Endpoint
-        String authorizationEndpoint = "http://localhost:8081/realms/nawabari/protocol/openid-connect/auth";
-
-        // state / nonce 값은 반드시 무작위 생성 (CSRF / Replay 방어용)
-        String state = UUID.randomUUID().toString();
-        String nonce = UUID.randomUUID().toString();
-
-        // 안전하게 인코딩된 쿼리스트링 구성
-        URI redirectUri = UriComponentsBuilder
-                .fromHttpUrl(authorizationEndpoint)
-                .queryParam("client_id", "diamond")
-                .queryParam("response_type", "code")
-                .queryParam("redirect_uri", "http://localhost:8888/sso/callback") // 꼭 인코딩됨
-                .queryParam("state", state)
-                .queryParam("nonce", nonce)
-                .build()
-                .encode() // ✅ 자동으로 RFC3986 인코딩 수행
-                .toUri();
-
-        // 👇 스프링이 자동으로 Keycloak /authorize 엔드포인트로 리다이렉트함
-        return new RedirectView(redirectUri.toString());
-    }
-
-    @GetMapping("/sso/callback")
-    public ResponseEntity<Object> loginCallback(
-            @RequestParam(required = false) String code,
-            @RequestParam(required = false) String state,
-            @RequestParam(required = false) String session_state,
-            @RequestParam(required = false) String error,
-            @RequestParam(required = false) String error_description
-    ) {
-
-        String authorizationEndpoint = "http://localhost:8081/realms/nawabari/protocol/openid-connect/auth";
-
-        log.info("code :: {}", code);
-        log.info("state :: {}", state);
-        log.info("session_state :: {}", session_state);
-        log.info("error :: {}", error);
-        log.info("error_description :: {}", error_description);
-
-
-
-        return new ResponseEntity<>(code, HttpStatus.OK);
-    }
-
-    @GetMapping("/logout")
-    public String logout() {
-
-        return "error.html";
+        return "login";
     }
 
     @GetMapping("/home")
     public String home() {
-
-        return "main.html";
+        return "main";
     }
 
 }

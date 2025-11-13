@@ -1,62 +1,68 @@
 package jm.diamond.controller.sso;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 
-/**
- * 기본 Wrapper 구현체
- */
-public class DefaultOidcUserDetailsWrapper implements OidcUserDetailsWrapper {
+@RequiredArgsConstructor
+public class WrappedOidcUser implements OidcUser, UserDetails {
+    
+    private final DefaultOidcUser delegateOidcUser;
+    private final UserDetails delegateUserDetails;
 
-    private final UserDetails userDetails;
-    private final OidcUser oidcUser;
-
-    // 파라미터 제네릭으로 userDetails를 구현한 클래스만 받는걸로 처리해도 될듯?
-    public DefaultOidcUserDetailsWrapper(UserDetails userDetails, OidcUser oidcUser) {
-        this.userDetails = userDetails;
-        this.oidcUser = oidcUser;
+    // OidcUser
+    @Override
+    public Map<String, Object> getClaims() {
+        return delegateOidcUser.getClaims();
     }
 
     @Override
-    public <A> A getAttribute(String name) {
-        return OidcUserDetailsWrapper.super.getAttribute(name);
+    public OidcUserInfo getUserInfo() {
+        return delegateOidcUser.getUserInfo();
+    }
+
+    @Override
+    public OidcIdToken getIdToken() {
+        return delegateOidcUser.getIdToken();
     }
 
     @Override
     public Map<String, Object> getAttributes() {
-        return Collections.emptyMap();
+        return delegateOidcUser.getAttributes();
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptyList();
+        return delegateOidcUser.getAuthorities();
     }
 
+    // UserDetails
+    
     @Override
     public String getPassword() {
-        return "";
+        return delegateUserDetails.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return "";
+        return delegateUserDetails.getUsername();
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return delegateUserDetails.isAccountNonExpired();
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return delegateUserDetails.isAccountNonLocked();
     }
 
     @Override
@@ -70,22 +76,7 @@ public class DefaultOidcUserDetailsWrapper implements OidcUserDetailsWrapper {
     }
 
     @Override
-    public Map<String, Object> getClaims() {
-        return Collections.emptyMap();
-    }
-
-    @Override
-    public OidcUserInfo getUserInfo() {
-        return null;
-    }
-
-    @Override
-    public OidcIdToken getIdToken() {
-        return null;
-    }
-
-    @Override
     public String getName() {
-        return "";
+        return delegateOidcUser.getName();
     }
 }
