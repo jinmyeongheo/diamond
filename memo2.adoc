@@ -64,3 +64,26 @@ SQL 실행 및 쿼리 파싱.
 
 그에 필요한 질문을 다양한 관점에서 던져주고
 답까지 자세하게 알려줘.
+
+
+
+
+  redis:
+    image: redis:7.4-alpine
+    container_name: redis-session
+    command: [
+      "redis-server",
+      "--appendonly", "yes",
+      "--save", "60", "1000"
+    ]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_session_data:/data
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+  ldap_data:
+  ldap_config:
+  redis_session_data:
